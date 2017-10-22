@@ -1,4 +1,4 @@
-// Generated from tcl.g4 by ANTLR 4.7
+// Generated from .\tcl.g4 by ANTLR 4.7
 package classes;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -251,11 +251,11 @@ public interface tclVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDefault_loop(tclParser.Default_loopContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link tclParser#declaracion}.
+	 * Visit a parse tree produced by {@link tclParser#puts}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDeclaracion(tclParser.DeclaracionContext ctx);
+	T visitPuts(tclParser.PutsContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link tclParser#gets}.
 	 * @param ctx the parse tree
@@ -263,11 +263,11 @@ public interface tclVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitGets(tclParser.GetsContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link tclParser#puts}.
+	 * Visit a parse tree produced by {@link tclParser#declaracion}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitPuts(tclParser.PutsContext ctx);
+	T visitDeclaracion(tclParser.DeclaracionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link tclParser#agrup}.
 	 * @param ctx the parse tree

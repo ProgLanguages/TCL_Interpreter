@@ -1,4 +1,4 @@
-// Generated from tcl.g4 by ANTLR 4.7
+// Generated from .\tcl.g4 by ANTLR 4.7
 package classes;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -408,15 +408,15 @@ public interface tclListener extends ParseTreeListener {
 	 */
 	void exitDefault_loop(tclParser.Default_loopContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link tclParser#declaracion}.
+	 * Enter a parse tree produced by {@link tclParser#puts}.
 	 * @param ctx the parse tree
 	 */
-	void enterDeclaracion(tclParser.DeclaracionContext ctx);
+	void enterPuts(tclParser.PutsContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link tclParser#declaracion}.
+	 * Exit a parse tree produced by {@link tclParser#puts}.
 	 * @param ctx the parse tree
 	 */
-	void exitDeclaracion(tclParser.DeclaracionContext ctx);
+	void exitPuts(tclParser.PutsContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link tclParser#gets}.
 	 * @param ctx the parse tree
@@ -428,15 +428,15 @@ public interface tclListener extends ParseTreeListener {
 	 */
 	void exitGets(tclParser.GetsContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link tclParser#puts}.
+	 * Enter a parse tree produced by {@link tclParser#declaracion}.
 	 * @param ctx the parse tree
 	 */
-	void enterPuts(tclParser.PutsContext ctx);
+	void enterDeclaracion(tclParser.DeclaracionContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link tclParser#puts}.
+	 * Exit a parse tree produced by {@link tclParser#declaracion}.
 	 * @param ctx the parse tree
 	 */
-	void exitPuts(tclParser.PutsContext ctx);
+	void exitDeclaracion(tclParser.DeclaracionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link tclParser#agrup}.
 	 * @param ctx the parse tree

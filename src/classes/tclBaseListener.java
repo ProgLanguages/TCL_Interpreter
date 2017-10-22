@@ -1,4 +1,4 @@
-// Generated from tcl.g4 by ANTLR 4.7
+// Generated from .\tcl.g4 by ANTLR 4.7
 package classes;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -496,13 +496,13 @@ public class tclBaseListener implements tclListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDeclaracion(tclParser.DeclaracionContext ctx) { }
+	@Override public void enterPuts(tclParser.PutsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitDeclaracion(tclParser.DeclaracionContext ctx) { }
+	@Override public void exitPuts(tclParser.PutsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -520,13 +520,13 @@ public class tclBaseListener implements tclListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPuts(tclParser.PutsContext ctx) { }
+	@Override public void enterDeclaracion(tclParser.DeclaracionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitPuts(tclParser.PutsContext ctx) { }
+	@Override public void exitDeclaracion(tclParser.DeclaracionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

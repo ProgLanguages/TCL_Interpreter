@@ -17,7 +17,6 @@ public class Interpreter {
 		ParseTree tree = parser.inicio();
 
 		VisitorTCL<Object> loader = new VisitorTCL<Object>();
-		loader.visit(tree);
-		
+		loader.visit(tree);		
 	}
 }

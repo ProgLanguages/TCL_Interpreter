@@ -125,6 +125,6 @@ OP_UNA	:	'!' | '-'  ;
 IDENTIFICADOR	:	[a-zA-Z_][a-zA-Z0-9_]*  ;
 VALOR_ENTERO	:	[0-9]+  ;
 VALOR_DOUBLE	:	[0-9]+ '.' [0-9]+  ;
-VALOR_STRING	:	'"' ~[\r\n]* '"'  ;
+VALOR_STRING	:	'"' ~[\r\n"]* '"'  ;
 WS	:	[ \t\r\n]+	->	skip  ;
 COMMENT	:	'#' ~[\r\n]*	->	skip  ;

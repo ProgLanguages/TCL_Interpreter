@@ -1,6 +1,10 @@
 package business;
 
 public class Error {
+
+    public static final String ERR_INT = "";
+    public static final String ERR_DOUBLE = "";
+    public static final String ERR_STRING = "";
 	
 	public static void printError(String mensaje, int line, int col){
 		System.err.printf("<%d:%d> Error semantico:  %s\n", line,col, mensaje);
@@ -26,4 +30,8 @@ public class Error {
 	public static String repeatedFunction(String nameFunc){		
 		return "la subrutina '" + nameFunc + "' ya ha sido declarada.";
 	}
+
+    public static String incompatibleData(String string, String ERR_STRING) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
