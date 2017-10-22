@@ -1,4 +1,4 @@
-package classes;
+package business;
 
 public class Variable {
 
@@ -18,11 +18,20 @@ public class Variable {
 	public Object getValor() {
 		return  valor;
 	}
+	
+	public int getTipo() {
+		return  tipo;
+	}
+	
+	public void setTipo(int t) {
+		tipo = t;
+	}
+	
 	public String valorToString(){
 		return valor.toString();
 	}
 	
-	public void updateValor(Object valor){
+	public void setValor(Object valor){
 		this.valor = valor;
 	}
 	

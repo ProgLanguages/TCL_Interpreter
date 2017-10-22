@@ -1,4 +1,4 @@
-package classes;
+package business;
 
 public class Error {
 	
