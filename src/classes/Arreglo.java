@@ -13,6 +13,15 @@ public class Arreglo {
 		size = 0;
 	}
 	
+	public void insertIndice(Object index, Variable val){
+		valsArreglo.put(index, val);
+		size++;
+	}
+	
+	public void updateIndex(Object index, Variable val){
+		valsArreglo.replace(index, val);
+	}
+	
 	public Variable getValue(Object index){
 		return valsArreglo.get(index);
 	}
@@ -21,4 +30,7 @@ public class Arreglo {
 		return valsArreglo.containsKey(key);
 	}
 	
+	public int getSize(){
+		return this.size;
+	}
 }

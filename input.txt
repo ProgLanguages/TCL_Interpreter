@@ -1,10 +1,13 @@
-proc sum { {a} {b} } { 
+set arreglo(1) 2;
+set arreglo("abc") 3.3;
+set arreglo(3.3) $arreglo(1);
+puts $arreglo(3.3);
 
-}
-
-puts [sum {1} {3} {[sum2 {1} {3} {4}]}];
-
-puts " asda ";
-puts [gets stdin];
-
-
+set arreglo(1) 2;
+set a 2;
+set arreglo("abc") 3.3;
+set arreglo(3.3) $arreglo(1);
+puts $arreglo(3.3);
+puts [array size arreglo];
+puts [array exists a];
+puts [array exists arreglo];

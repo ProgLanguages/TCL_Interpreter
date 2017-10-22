@@ -65,9 +65,9 @@ case_loop	:	inicio_case cuerpo_loop '}' case2_loop  ;
 case2_loop	:	inicio_case cuerpo_loop '}' case2_loop | default_loop  ;
 default_loop	:	inicio_default cuerpo_loop '}' |  ;
 
-declaracion	:	'set' IDENTIFICADOR indice asignacion ';'  ;
-gets	:	'gets' 'stdin'  ;
 puts	:	'puts' asignacion ';'  ;
+gets	:	'gets' 'stdin'  ;
+declaracion	:	'set' IDENTIFICADOR indice asignacion ';'  ;
 
 agrup	:	'[' aux_agrup  ;
 aux_agrup	:	expr ']' | IDENTIFICADOR param_func ']' | gets ']' | 'array' aux_array  ;

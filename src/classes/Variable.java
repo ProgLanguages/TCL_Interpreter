@@ -21,4 +21,10 @@ public class Variable {
 	public String valorToString(){
 		return valor.toString();
 	}
+	
+	public void updateValor(Object valor){
+		this.valor = valor;
+	}
+	
+	
 }
