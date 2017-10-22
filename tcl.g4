@@ -52,6 +52,7 @@ cuerpo_inst	:	declaracion cuerpo_inst | r_for cuerpo_inst | gets ';' cuerpo_inst
 			
 r_for	:	inicio_for cuerpo_loop '}'  ;
 r_while	:	inicio_while cuerpo_loop '}'  ;
+
 cuerpo_loop	:	declaracion cuerpo_loop | r_for cuerpo_loop | gets ';' cuerpo_loop | if_loop cuerpo_loop 
 			| puts cuerpo_loop | r_while cuerpo_loop | switch_loop cuerpo_loop | r_break cuerpo_loop 
 			| r_continue cuerpo_loop | agrup ';' cuerpo_loop |  ;
@@ -97,11 +98,14 @@ asig_for	:	VALOR_ENTERO | '$' IDENTIFICADOR indice | expr  ;
 inicio_if	:	'if' '{' expresion '}' 'then' '{'  ;
 inicio_elseif	:	'elseif' '{' expresion '}' 'then' '{'  ;
 inicio_else	:	'else' '{'  ;
-inicio_for	:	'for' '{' 'set' IDENTIFICADOR asig_for '}' '{' expresion '}' '{' 'incr' IDENTIFICADOR incremento '}' '{'  ;
-inicio_while	:	'while' '{' expresion '}' '{'  ;
 inicio_switch	:	'switch' '$' IDENTIFICADOR indice '{'  ;
 inicio_case	:	'case' VALOR_ENTERO '{'  ;
 inicio_default	:	'default' '{'  ;
+
+inicio_for	:	'for' '{' dec_for '}' '{' expresion '}' '{' 'incr' IDENTIFICADOR incremento '}' '{'  ;
+dec_for : 'set' IDENTIFICADOR asig_for ;
+
+inicio_while	:	'while' '{' expresion '}' '{'  ;
 
 expresion	:	exp_or  ;
 exp_or	:	exp_or '||' exp_and | exp_and  ;

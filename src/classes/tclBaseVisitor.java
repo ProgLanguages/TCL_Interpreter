@@ -1,4 +1,4 @@
-// Generated from .\tcl.g4 by ANTLR 4.7
+// Generated from tcl.g4 by ANTLR 4.7
 package classes;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
@@ -458,20 +458,6 @@ public class tclBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements tc
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitInicio_for(tclParser.Inicio_forContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitInicio_while(tclParser.Inicio_whileContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitInicio_switch(tclParser.Inicio_switchContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -487,6 +473,27 @@ public class tclBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements tc
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitInicio_default(tclParser.Inicio_defaultContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitInicio_for(tclParser.Inicio_forContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitDec_for(tclParser.Dec_forContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitInicio_while(tclParser.Inicio_whileContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

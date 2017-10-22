@@ -1,4 +1,4 @@
-// Generated from .\tcl.g4 by ANTLR 4.7
+// Generated from tcl.g4 by ANTLR 4.7
 package classes;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -389,18 +389,6 @@ public interface tclVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitInicio_else(tclParser.Inicio_elseContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link tclParser#inicio_for}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitInicio_for(tclParser.Inicio_forContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link tclParser#inicio_while}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitInicio_while(tclParser.Inicio_whileContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link tclParser#inicio_switch}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -418,6 +406,24 @@ public interface tclVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitInicio_default(tclParser.Inicio_defaultContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link tclParser#inicio_for}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInicio_for(tclParser.Inicio_forContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link tclParser#dec_for}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDec_for(tclParser.Dec_forContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link tclParser#inicio_while}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInicio_while(tclParser.Inicio_whileContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link tclParser#expresion}.
 	 * @param ctx the parse tree

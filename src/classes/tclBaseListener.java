@@ -1,4 +1,4 @@
-// Generated from .\tcl.g4 by ANTLR 4.7
+// Generated from tcl.g4 by ANTLR 4.7
 package classes;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -772,30 +772,6 @@ public class tclBaseListener implements tclListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterInicio_for(tclParser.Inicio_forContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitInicio_for(tclParser.Inicio_forContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterInicio_while(tclParser.Inicio_whileContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitInicio_while(tclParser.Inicio_whileContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterInicio_switch(tclParser.Inicio_switchContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -827,6 +803,42 @@ public class tclBaseListener implements tclListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitInicio_default(tclParser.Inicio_defaultContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterInicio_for(tclParser.Inicio_forContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitInicio_for(tclParser.Inicio_forContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDec_for(tclParser.Dec_forContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDec_for(tclParser.Dec_forContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterInicio_while(tclParser.Inicio_whileContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitInicio_while(tclParser.Inicio_whileContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

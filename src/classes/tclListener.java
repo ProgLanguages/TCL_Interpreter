@@ -1,4 +1,4 @@
-// Generated from .\tcl.g4 by ANTLR 4.7
+// Generated from tcl.g4 by ANTLR 4.7
 package classes;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -638,26 +638,6 @@ public interface tclListener extends ParseTreeListener {
 	 */
 	void exitInicio_else(tclParser.Inicio_elseContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link tclParser#inicio_for}.
-	 * @param ctx the parse tree
-	 */
-	void enterInicio_for(tclParser.Inicio_forContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link tclParser#inicio_for}.
-	 * @param ctx the parse tree
-	 */
-	void exitInicio_for(tclParser.Inicio_forContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link tclParser#inicio_while}.
-	 * @param ctx the parse tree
-	 */
-	void enterInicio_while(tclParser.Inicio_whileContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link tclParser#inicio_while}.
-	 * @param ctx the parse tree
-	 */
-	void exitInicio_while(tclParser.Inicio_whileContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link tclParser#inicio_switch}.
 	 * @param ctx the parse tree
 	 */
@@ -687,6 +667,36 @@ public interface tclListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitInicio_default(tclParser.Inicio_defaultContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link tclParser#inicio_for}.
+	 * @param ctx the parse tree
+	 */
+	void enterInicio_for(tclParser.Inicio_forContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link tclParser#inicio_for}.
+	 * @param ctx the parse tree
+	 */
+	void exitInicio_for(tclParser.Inicio_forContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link tclParser#dec_for}.
+	 * @param ctx the parse tree
+	 */
+	void enterDec_for(tclParser.Dec_forContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link tclParser#dec_for}.
+	 * @param ctx the parse tree
+	 */
+	void exitDec_for(tclParser.Dec_forContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link tclParser#inicio_while}.
+	 * @param ctx the parse tree
+	 */
+	void enterInicio_while(tclParser.Inicio_whileContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link tclParser#inicio_while}.
+	 * @param ctx the parse tree
+	 */
+	void exitInicio_while(tclParser.Inicio_whileContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link tclParser#expresion}.
 	 * @param ctx the parse tree
