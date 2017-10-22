@@ -5,6 +5,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Scanner;
 
+import org.antlr.v4.parse.ANTLRParser.sync_return;
+
 import business.Arreglo;
 import business.Constants;
 import business.Error;
@@ -13,8 +15,11 @@ import business.Variable;
 import classes.tclBaseVisitor;
 import classes.tclParser.AgrupContext;
 import classes.tclParser.AsignacionContext;
+import classes.tclParser.Case_funcionContext;
 import classes.tclParser.DeclaracionContext;
 import classes.tclParser.Declaracion_funcionContext;
+import classes.tclParser.Else_funcionContext;
+import classes.tclParser.Elseif_funcionContext;
 import classes.tclParser.Exp_addContext;
 import classes.tclParser.Exp_andContext;
 import classes.tclParser.Exp_igContext;
@@ -24,10 +29,17 @@ import classes.tclParser.Exp_potContext;
 import classes.tclParser.Exp_relContext;
 import classes.tclParser.Exp_unaContext;
 import classes.tclParser.GetsContext;
+import classes.tclParser.If_funcionContext;
 import classes.tclParser.IndiceContext;
 import classes.tclParser.InicioContext;
+import classes.tclParser.Inicio_caseContext;
+import classes.tclParser.Inicio_elseifContext;
+import classes.tclParser.Inicio_ifContext;
+import classes.tclParser.Inicio_switchContext;
 import classes.tclParser.Param_funcContext;
 import classes.tclParser.PutsContext;
+import classes.tclParser.R_ifContext;
+import classes.tclParser.Switch_funcionContext;
 import classes.tclParser.ValorContext;
 
 public class VisitorTCL<T> extends tclBaseVisitor<T> {
@@ -66,6 +78,153 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 		return super.visitDeclaracion_funcion(ctx);
 	}
 	
+	// Falta manejar lo del scope en las funciones
+	@Override
+	public T visitIf_funcion(If_funcionContext ctx) {
+		int result = (int)(((Variable) visitInicio_if(ctx.inicio_if())).getValor());
+		if(result == 1){
+			return visitCuerpo_funcion(ctx.cuerpo_funcion());
+		} else {
+			return visitElseif_funcion(ctx.elseif_funcion());
+		}			
+	}	
+	
+	@Override
+	public T visitElseif_funcion(Elseif_funcionContext ctx) {
+		if(ctx.else_funcion() != null){
+			return visitElse_funcion(ctx.else_funcion());
+		} else {			
+			int result = (int)(((Variable) visitInicio_elseif(ctx.inicio_elseif())).getValor());
+			if(result == 1){
+				return visitCuerpo_funcion(ctx.cuerpo_funcion());
+			} else {
+				return visitElseif_funcion(ctx.elseif_funcion());
+			}
+		}
+	}
+	
+	@Override
+	public T visitElse_funcion(Else_funcionContext ctx) {		
+		if(ctx.inicio_else() != null){
+			return visitCuerpo_funcion(ctx.cuerpo_funcion());
+		} else{
+			return null;
+		}
+	}
+	
+	@Override
+	public T visitR_if(R_ifContext ctx) {
+		int result = (int)(((Variable) visitInicio_if(ctx.inicio_if())).getValor());
+		if(result == 1){
+			tables.add(new Hashtable<>());
+			visitCuerpo_inst(ctx.cuerpo_inst());
+			tables.remove(tables.size()-1);
+			return null;
+		} else {
+			return visitElseif(ctx.elseif());
+		}
+	}
+	
+	@Override
+	public T visitSwitch_funcion(Switch_funcionContext ctx) {
+		Variable var = (Variable) visitInicio_switch(ctx.inicio_switch());
+		Hashtable<String, Object> tempTable = tables.get(tables.size()-1);
+		
+		String nameVar = "-switch" + ctx.inicio_switch().IDENTIFICADOR().getText();
+		tempTable.put(nameVar, var);
+		visitCase_funcion(ctx.case_funcion());
+		
+		tempTable.remove(nameVar);
+		
+		return super.visitSwitch_funcion(ctx);
+	}
+	
+	@Override
+	public T visitCase_funcion(Case_funcionContext ctx) {
+		Variable value = (Variable)visitInicio_case(ctx.inicio_case());
+		
+		return super.visitCase_funcion(ctx);
+	}
+	
+	@Override
+	public T visitInicio_case(Inicio_caseContext ctx) {
+		return (T) new Variable(Constants.INT, Integer.parseInt(ctx.VALOR_ENTERO().getText()));
+	}
+	
+	@Override
+	public T visitInicio_switch(Inicio_switchContext ctx) {
+		String nameVar = ctx.IDENTIFICADOR().getText();		
+		Variable indice = (Variable) visitIndice(ctx.indice());
+		Variable result;
+		result = new Variable(Constants.INT, 0);
+//		result = (Variable)visitIdentificador(ctx.IDENTIFICADOR(), indice);
+		
+		if(result.getTipo() != Constants.INT){
+			String msj = "";
+			if(result.getTipo() == Constants.DOUBLE){
+				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
+			} else {
+				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING);
+			}
+			int line = ctx.IDENTIFICADOR().getSymbol().getLine();
+			int col = ctx.IDENTIFICADOR().getSymbol().getCharPositionInLine();
+			Error.printError(msj, line, col);
+			return null;
+		} else {
+			return (T) result;
+		}
+	}
+	
+	@Override
+	public T visitInicio_if(Inicio_ifContext ctx) {
+		Variable result = (Variable)visitExpresion(ctx.expresion());
+		
+		if(result.getTipo() != Constants.INT){
+			String msj = "";
+			if(result.getTipo() == Constants.DOUBLE){
+				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);			
+			} else if(result.getTipo() == Constants.STRING){				
+				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING);
+			}
+			int line = ctx.expresion().getStart().getLine();
+			int col = ctx.expresion().getStart().getCharPositionInLine()+1;
+			Error.printError(msj, line, col);
+			return null;
+		} else {
+			int res = (int)result.getValor();
+			if(res != 0){
+				return (T) new Variable(Constants.INT, 1);
+			} else {
+				return (T) new Variable(Constants.INT, 0);
+			}
+		}
+	}
+	
+	@Override
+	public T visitInicio_elseif(Inicio_elseifContext ctx) {
+		Variable result = (Variable) visitExpresion(ctx.expresion());
+
+		if (result.getTipo() != Constants.INT) {
+			String msj = "";
+			if (result.getTipo() == Constants.DOUBLE) {
+				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
+			} else if (result.getTipo() == Constants.STRING) {
+				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING);
+			}
+			int line = ctx.expresion().getStart().getLine();
+			int col = ctx.expresion().getStart().getCharPositionInLine() + 1;
+			Error.printError(msj, line, col);
+			return null;
+		} else {
+			int res = (int) result.getValor();
+			if (res != 0) {
+				return (T) new Variable(Constants.INT, 1);
+			} else {
+				return (T) new Variable(Constants.INT, 0);
+			}
+		}
+	}
+	
 	
 	@Override
 	public T visitDeclaracion(DeclaracionContext ctx) {
@@ -89,7 +248,17 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 				tempTable.put(nameVar, newValue);
 			}
 		} else {
-			if(indice != null){ // si se cumple se puede actualizar o un nuevo indice
+			if(indice != null){ // si se cumple se puede actualizar o un nuevo indice				
+				// si se estan intentando acceder a una que no es arreglo -> ERROR
+				if(temp.getClass().getName().equals("business.Variable")){ 
+					String msj = Error.variableNotArray(nameVar);
+					int line = ctx.IDENTIFICADOR().getSymbol().getLine();
+					int col = ctx.IDENTIFICADOR().getSymbol().getCharPositionInLine();
+					Error.printError(msj, line, col);
+					return null;
+				}
+				
+				
 				Arreglo arr = (Arreglo)temp;
 				if(arr.containsKey(indice.getValor())){ // se actualiza valor de indice
 					arr.updateIndex(indice.getValor(), newValue);
@@ -302,7 +471,6 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 		return (T) new Variable(Constants.STRING, result.toString());
 	}	
 	
-	
 	@Override
 	public T visitGets(GetsContext ctx) {
 		Scanner input = new Scanner(System.in);
@@ -318,7 +486,6 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 		}
 	}
 	
-	
 	/*
 	 * Funcion se encarga de mirar si la variable existe en alguna de las tablas
 	 * Si no existe retorna null y si existe retorna la Variable que corresponda
@@ -333,7 +500,8 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 	}
 	
 	
-    @Override
+   
+	@Override
     public T visitExp_or(Exp_orContext ctx) {
         Variable var1, var2 = (Variable) visitExp_and(ctx.exp_and()), var3;
         if (ctx.exp_or() != null) {

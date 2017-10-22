@@ -2,6 +2,10 @@ package business;
 
 public class Error {
 	
+	public static final String ERR_STRING = "string";
+	public static final String ERR_INT = "integer";
+	public static final String ERR_DOUBLE = "double";
+	
 	public static void printError(String mensaje, int line, int col){
 		System.err.printf("<%d:%d> Error semantico:  %s\n", line,col, mensaje);
 		System.exit(-1);
@@ -25,5 +29,9 @@ public class Error {
 	
 	public static String repeatedFunction(String nameFunc){		
 		return "la subrutina '" + nameFunc + "' ya ha sido declarada.";
+	}
+	
+	public static String incompatibleData(String wanted, String found){		
+		return "tipos de datos incompatibles. Se esperaba: " + wanted + "; se encontro: " + found + ".";
 	}
 }

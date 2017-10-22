@@ -1,8 +1,26 @@
-set arreglo(1) 2;
-set a 2;
+proc sum {}{
+	if {0} then {
+	    set a 2;
+	    puts $a;
+	} elseif {0} then {
+		puts 5;
+		return;
+	} elseif {0} then {
+		puts 8;
+		return;
+	}
+}
+
+set arreglo 1;
+
+
 set arreglo("abc") 3.3;
-set arreglo(3.3) $arreglo(1);
+set arreglo(3.3) $arreglo(2);
 puts $arreglo(3.3);
 
 puts [array exists a];
 puts [array exists arreglo];
+
+if {1}then {
+	puts 1;
+}
