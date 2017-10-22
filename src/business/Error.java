@@ -1,7 +1,7 @@
 package business;
 
 public class Error {
-	
+
 	public static final String ERR_STRING = "string";
 	public static final String ERR_INT = "integer";
 	public static final String ERR_DOUBLE = "double";

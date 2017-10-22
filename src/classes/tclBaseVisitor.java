@@ -1,4 +1,4 @@
-// Generated from tcl.g4 by ANTLR 4.7
+// Generated from .\tcl.g4 by ANTLR 4.7
 package classes;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
@@ -297,7 +297,7 @@ public class tclBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements tc
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitDeclaracion(tclParser.DeclaracionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitPuts(tclParser.PutsContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -311,7 +311,7 @@ public class tclBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements tc
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitPuts(tclParser.PutsContext ctx) { return visitChildren(ctx); }
+	@Override public T visitDeclaracion(tclParser.DeclaracionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
