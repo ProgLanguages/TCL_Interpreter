@@ -1,15 +1,18 @@
-proc sum {{pirujo}} {
-	set suma 0;
-	for {set i 0} {$i < 4} {incr i} {
-		set suma [expr {$suma + $pirujo([expr {$i}])}];
-		puts $suma;
+
+
+set i 1;
+while{$i < 5}{
+	set j $i;
+	puts $i;
+	while {$j < 3}{
+		if {$j == 2} then {
+			puts "break $j";
+			break;
+		} else {
+			puts "No break $j";
+		}
+		set j [expr {$j+1}];
 	}
-	return $suma;
+	set i [expr {$i+1}];
 }
 
-set arr(0) 10;
-set arr(1) 3;
-set arr(2) 50;
-set arr(3) 2;
-
-puts [sum {$arr}];

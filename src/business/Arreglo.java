@@ -14,7 +14,7 @@ public class Arreglo {
 	}
 	
 	public void insertIndice(Object index, Variable val){
-		valsArreglo.put(index, val);
+		valsArreglo.put(index, new Variable(val));
 		size++;
 	}
 	

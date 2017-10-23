@@ -10,6 +10,11 @@ public class Variable {
 		this.valor = valor;
 	}
 
+	public Variable(Variable newVar){
+		this.tipo = newVar.getTipo();
+		this.valor = newVar.getValor();
+	}
+	
 	@Override
 	public String toString() {
 		return "Variable [tipo=" + tipo + ", valor=" + valor + "]";

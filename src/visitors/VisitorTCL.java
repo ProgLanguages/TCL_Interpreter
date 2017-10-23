@@ -150,7 +150,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 				visitCuerpo_funcion(ctx.cuerpo_funcion());
 				funcActual.removeTable();
 			} else {
-				if(ctx.case2_funcion() != null){
+				if(ctx.case2_funcion() != null && !ctx.case2_funcion().getText().isEmpty()){
 					return visitCase2_funcion(ctx.case2_funcion());
 				} 
 			}		
@@ -278,7 +278,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
             visitCuerpo_loop_func(ctx.cuerpo_loop_func());
             funcActual.removeTable();
         } else {
-            if(ctx.case2_loop_func()!= null){
+            if(ctx.case2_loop_func()!= null && !ctx.case2_loop_func().getText().isEmpty()){
                 return visitCase2_loop_func(ctx.case2_loop_func());
             }
         }
@@ -419,7 +419,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 	@Override
 	public T visitR_switch(R_switchContext ctx) {
 		Variable var = (Variable) visitInicio_switch(ctx.inicio_switch());
-		Map<String, Object> tempTable = tables.get(tables.size() - 1);
+		Map<String, Object> tempTable = selectTable();
 
 		String nameVar = "-switch";
 		tempTable.put(nameVar, var);
@@ -431,13 +431,13 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 	@Override
 	public T visitR_case(R_caseContext ctx) {
 		int valor = (int)((Variable)visitInicio_case(ctx.inicio_case())).getValor();
-		Variable temp = (Variable)tables.get(tables.size()-1).get("-switch");
+		Variable temp = (Variable)selectTable().get("-switch");
 		if(valor == (int)temp.getValor()){
 			tables.add(new HashMap<>());
 			visitCuerpo_inst(ctx.cuerpo_inst());
 			tables.remove(tables.size()-1);
 		} else {
-			if(ctx.case2() != null){
+			if(ctx.case2() != null && !ctx.case2().getText().isEmpty()){
 				return visitCase2(ctx.case2());				
 			} 
 		}		
@@ -450,7 +450,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 			return visitR_default(ctx.r_default());
 		} else {
 			int valor = (int) ((Variable)visitInicio_case(ctx.inicio_case())).getValor();
-			Variable temp = (Variable) tables.get(tables.size()-1).get("-switch");
+			Variable temp = (Variable) selectTable().get("-switch");
 			if(valor == (int) temp.getValor()){
 				tables.add(new HashMap<>());
 				visitCuerpo_inst(ctx.cuerpo_inst());
@@ -534,8 +534,8 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 			Error.printError(msj, getLocation(ctx.asig_for()));
 		}
 		if (temp == null) { // Si se cumple la variable no exist�a
-			Map<String, Object> tempTable = tables.get(tables.size() - 1);
-			tempTable.put(nameVar, newValue);
+			Map<String, Object> tempTable = selectTable();
+			tempTable.put(nameVar, new Variable(newValue));
 		} else {			
 			temp.setValor(newValue.getValor());
 		}		
@@ -548,8 +548,9 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 			return (T) new Variable(Constants.INT, Integer.parseInt(ctx.VALOR_ENTERO().getText()));
 		} else if(ctx.IDENTIFICADOR() != null){
 			return visitIdentificador(ctx.IDENTIFICADOR(), ctx.indice());
-		} else {
-			return visitExpresion(ctx.expr().expresion());
+		} else {			
+			Variable aux = (Variable)visitExpresion(ctx.expr().expresion());
+			return (T)aux;
 		}
 	}
 	
@@ -627,13 +628,13 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 		Map<String, Object> tempTable;
 		if (temp == null) {                             // Si se cumple la variable no existia
 			if (indice != null) {                   // si se cumple se esta creando un nuevo arreglo
-                                tempTable = tables.get(tables.size() - 1);
+				tempTable = selectTable();
 				Arreglo newArreglo = new Arreglo();
-				newArreglo.insertIndice(indice.getValor(), newValue);
+				newArreglo.insertIndice(indice.getValor(), new Variable(newValue));
 				tempTable.put(nameVar, newArreglo);
 			} else {                                // si no se esta creando una nueva variable
-				tempTable = tables.get(tables.size() - 1);
-				tempTable.put(nameVar, newValue);
+				tempTable = selectTable();
+				tempTable.put(nameVar, new Variable(newValue));
 			}
 		} else {
 			if (indice != null) { // si se cumple se puede actualizar o un nuevo indice
@@ -645,18 +646,20 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 				}
 				Arreglo arr = (Arreglo) temp;
 				if (arr.containsKey(indice.getValor())) { // se actualiza valor de indice
-					arr.updateIndex(indice.getValor(), newValue);
+					arr.updateIndex(indice.getValor(), new Variable(newValue));
 				} else { // si no se crea un nuevo indice
-					arr.insertIndice(indice.getValor(), newValue);
+					arr.insertIndice(indice.getValor(), new Variable(newValue));
 				}
 			} else {            // se cambia a variable si la que existia era arreglo
 				if (temp.getClass().getName().equals("business.Arreglo")) {
-					tempTable = tables.get(tables.size() - 1);
+					tempTable = selectTable();
 					tempTable.remove(nameVar);
-					tempTable.put(nameVar, newValue);
-				}           // se actualiza el valor de la variable
-                                Variable cur = (Variable) temp;
-                                cur.setValor(newValue.getValor());
+					tempTable.put(nameVar, new Variable(newValue));
+				} else {
+					// se actualiza el valor de la variable
+					Variable cur = (Variable) temp;
+					cur.setValor(newValue.getValor());
+				}
 			}
 		}
 		return null;
@@ -823,6 +826,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
         while((int)expresion.getValor() != 0){
             hasToBreak = false;
             hasToContinue = false;
+//            System.out.println(ctx.cuerpo_loop().getText());
             visitCuerpo_loop(ctx.cuerpo_loop());
             if (hasToBreak){
                 hasToBreak = false;
@@ -895,7 +899,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
     @Override
     public T visitSwitch_loop(Switch_loopContext ctx) {
 		Variable var = (Variable) visitInicio_switch(ctx.inicio_switch());
-		Map<String, Object> tempTable = tables.get(tables.size() - 1);
+		Map<String, Object> tempTable = selectTable();
 
 		String nameVar = "-switch";
 		tempTable.put(nameVar, var);
@@ -907,7 +911,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
     @Override
     public T visitCase_loop(Case_loopContext ctx) {
 		int valor = (int)((Variable)visitInicio_case(ctx.inicio_case())).getValor();
-		Variable temp = (Variable)tables.get(tables.size()-1).get("-switch");
+		Variable temp = (Variable)selectTable().get("-switch");
 		if(valor == (int)temp.getValor()){
 			tables.add(new HashMap<>());
 			visitCuerpo_loop(ctx.cuerpo_loop());
@@ -926,13 +930,13 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 			return visitDefault_loop(ctx.default_loop());
 		} else {
 			int valor = (int) ((Variable)visitInicio_case(ctx.inicio_case())).getValor();
-			Variable temp = (Variable) tables.get(tables.size()-1).get("-switch");
+			Variable temp = (Variable) selectTable().get("-switch");
 			if(valor == (int) temp.getValor()){
 				tables.add(new HashMap<>());
 				visitCuerpo_loop(ctx.cuerpo_loop());
 				tables.remove(tables.size() - 1);
 			} else {
-				if(ctx.case2_loop() != null){
+				if(ctx.case2_loop() != null && !ctx.case2_loop().getText().isEmpty()){
 					return visitCase2_loop(ctx.case2_loop());
 				} 
 			}		
@@ -1354,5 +1358,13 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 
     public String getLocation(ParserRuleContext ctx) {
         return ctx.getStart().getLine() + ":" + (ctx.getStart().getCharPositionInLine()+1);
+    }
+
+    public Map<String, Object> selectTable(){
+    	if(funcActual != null){
+    		return funcActual.getLastTable();
+    	} else {
+    		return tables.get(tables.size()-1);
+    	}
     }
 }

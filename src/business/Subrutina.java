@@ -65,7 +65,11 @@ public class Subrutina {
 	}
 	
 	public Object getVarSwitch(){
-		return tableVars.get(tableVars.size()-1).get("-switch");
+		return getLastTable().get("-switch");
+	}
+	
+	public Map<String, Object> getLastTable(){
+		return tableVars.get(tableVars.size()-1);
 	}
 	
 }
