@@ -1,4 +1,4 @@
-// Generated from tcl.g4 by ANTLR 4.7
+// Generated from .\tcl.g4 by ANTLR 4.7
 package classes;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 

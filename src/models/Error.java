@@ -1,4 +1,4 @@
-package business;
+package models;
 
 public class Error {
 

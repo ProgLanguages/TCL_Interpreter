@@ -1,4 +1,4 @@
-package business;
+package models;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,10 +9,10 @@ import classes.tclParser.Cuerpo_funcionContext;
 import java.util.Iterator;
 
 public class Subrutina {
-	List<String> argumentos;
-	Cuerpo_funcionContext bloqueInstruccion;
-	List<Map<String, Object>> tableVars;
-	
+	private List<String> argumentos;
+	private Cuerpo_funcionContext bloqueInstruccion;
+	private List<Map<String, Object>> tableVars;
+
 	public Subrutina(Cuerpo_funcionContext dec, List<String> parametros){
 		this.argumentos = parametros;
 		this.bloqueInstruccion = dec;
@@ -41,14 +41,14 @@ public class Subrutina {
         Iterator<String> argIt = argumentos.iterator();
         Iterator<Variable> parIt = params.iterator();
         while (argIt.hasNext()) {
-            tableVars.get(0).replace(argIt.next(), parIt.next());
+            tableVars.get(tableVars.size()-1).replace(argIt.next(), new Variable(parIt.next()));
         }
     }
 
-    private void addArgumentos() {
+    public void addArgumentos() {
         Iterator<String> argIt = argumentos.iterator();
         while (argIt.hasNext()) {
-            tableVars.get(0).put(argIt.next(), null);
+            tableVars.get(tableVars.size()-1).put(argIt.next(), null);
         }
     }
 

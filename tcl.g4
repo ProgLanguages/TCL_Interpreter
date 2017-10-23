@@ -80,7 +80,7 @@ aux_param	:	asignacion '}' param_func | expr '}' param_func  ;
 asignacion	:	valor | '$' IDENTIFICADOR indice | agrup  ;
 
 indice	:	'(' val_indice ')' |  ;
-val_indice	:	valor | agrup  ;
+val_indice	:	valor | agrup | '$' IDENTIFICADOR indice ;
 
 valor	:	VALOR_STRING | VALOR_ENTERO | VALOR_DOUBLE  ;
 
@@ -126,7 +126,7 @@ op_una	:	'-' | '!'  ;
 
 
 IDENTIFICADOR	:	[a-zA-Z_][a-zA-Z0-9_]*  ;
-VALOR_ENTERO	:	[0-9]+  ;
+VALOR_ENTERO	:	'-'?[0-9]+  ;
 VALOR_DOUBLE	:	[0-9]+ '.' [0-9]+  ;
 VALOR_STRING	:	'"' ~[\r\n"]* '"'  ;
 WS	:	[ \t\r\n]+	->	skip  ;

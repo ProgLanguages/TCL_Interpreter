@@ -1,9 +1,9 @@
-package business;
+package models;
 
 public class Variable {
 
-	int tipo;
-	Object valor;
+	private int tipo;
+	private Object valor;
 	
 	public Variable(int tipo, Object valor){
 		this.tipo = tipo;

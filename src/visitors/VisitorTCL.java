@@ -4,28 +4,97 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Scanner;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import business.*;
-import business.Error;
 import classes.tclBaseVisitor;
-import classes.tclParser;
-import classes.tclParser.*;
+import classes.tclParser.AgrupContext;
+import classes.tclParser.Args_funcionContext;
+import classes.tclParser.Asig_forContext;
+import classes.tclParser.AsignacionContext;
+import classes.tclParser.Case2Context;
+import classes.tclParser.Case2_funcionContext;
+import classes.tclParser.Case2_loopContext;
+import classes.tclParser.Case2_loop_funcContext;
+import classes.tclParser.Case_funcionContext;
+import classes.tclParser.Case_loopContext;
+import classes.tclParser.Case_loop_funcContext;
+import classes.tclParser.Cuerpo_funcionContext;
+import classes.tclParser.Cuerpo_loopContext;
+import classes.tclParser.Cuerpo_loop_funcContext;
+import classes.tclParser.Dec_forContext;
+import classes.tclParser.DeclaracionContext;
+import classes.tclParser.Declaracion_funcionContext;
+import classes.tclParser.Default_funcionContext;
+import classes.tclParser.Default_loopContext;
+import classes.tclParser.Default_loop_funcContext;
+import classes.tclParser.Else_funcionContext;
+import classes.tclParser.Else_loop_funcContext;
+import classes.tclParser.ElseifContext;
+import classes.tclParser.Elseif_funcionContext;
+import classes.tclParser.Elseif_loopContext;
+import classes.tclParser.Elseif_loop_funcContext;
+import classes.tclParser.Exp_addContext;
+import classes.tclParser.Exp_andContext;
+import classes.tclParser.Exp_igContext;
+import classes.tclParser.Exp_mulContext;
+import classes.tclParser.Exp_orContext;
+import classes.tclParser.Exp_potContext;
+import classes.tclParser.Exp_relContext;
+import classes.tclParser.Exp_unaContext;
+import classes.tclParser.For_funcionContext;
+import classes.tclParser.GetsContext;
+import classes.tclParser.If_funcionContext;
+import classes.tclParser.If_loopContext;
+import classes.tclParser.If_loop_funcContext;
+import classes.tclParser.IncrementoContext;
+import classes.tclParser.IndiceContext;
+import classes.tclParser.InicioContext;
+import classes.tclParser.Inicio_caseContext;
+import classes.tclParser.Inicio_elseifContext;
+import classes.tclParser.Inicio_ifContext;
+import classes.tclParser.Inicio_switchContext;
+import classes.tclParser.Inicio_whileContext;
+import classes.tclParser.Param_funcContext;
+import classes.tclParser.PutsContext;
+import classes.tclParser.R_breakContext;
+import classes.tclParser.R_caseContext;
+import classes.tclParser.R_continueContext;
+import classes.tclParser.R_defaultContext;
+import classes.tclParser.R_elseContext;
+import classes.tclParser.R_forContext;
+import classes.tclParser.R_ifContext;
+import classes.tclParser.R_returnContext;
+import classes.tclParser.R_switchContext;
+import classes.tclParser.R_whileContext;
+import classes.tclParser.Switch_funcionContext;
+import classes.tclParser.Switch_loopContext;
+import classes.tclParser.Switch_loop_funcContext;
+import classes.tclParser.TermContext;
+import classes.tclParser.ValorContext;
+import classes.tclParser.While_funcionContext;
+import models.Arreglo;
+import models.Constants;
+import models.Error;
+import models.Subrutina;
+import models.Variable;
 
 public class VisitorTCL<T> extends tclBaseVisitor<T> {
 
-    List<Map<String, Object>> tables = new ArrayList<>();
-    Map<String, Subrutina> tableFunctions = new HashMap<>();
-    Subrutina funcActual = null;
-    Variable returnValue = null;
+    private List<Map<String, Object>> tables = new ArrayList<>();
+    private Map<String, Subrutina> tableFunctions = new HashMap<>();
+    private Subrutina funcActual = null;
+    private Variable returnValue = null;
     
-    boolean hasToBreak;
-    boolean hasToContinue;
+    private boolean hasToBreak;
+    private boolean hasToContinue;
 
+	Scanner input = new Scanner(System.in);
+    
     @Override
     public T visitInicio(InicioContext ctx) {
         tables.add(new HashMap<>());
@@ -61,7 +130,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
     }
     
     @Override
-    public T visitArgs_funcion(tclParser.Args_funcionContext ctx) {
+    public T visitArgs_funcion(Args_funcionContext ctx) {
         if (ctx.args_funcion()!= null) {
             List<String> params = (List<String>) visitArgs_funcion(ctx.args_funcion());
             params.add(ctx.IDENTIFICADOR().getText());
@@ -181,7 +250,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 	}
 
     @Override
-    public T visitWhile_funcion(tclParser.While_funcionContext ctx) {
+    public T visitWhile_funcion(While_funcionContext ctx) {
         funcActual.setTable();
         Variable expresion = (Variable) visitInicio_while(ctx.inicio_while());
         while((int)expresion.getValor() != 0){
@@ -205,7 +274,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
     }
 
     @Override
-    public T visitFor_funcion(tclParser.For_funcionContext ctx) {
+    public T visitFor_funcion(For_funcionContext ctx) {
         funcActual.setTable();
         visitDec_for(ctx.inicio_for().dec_for());
         Variable expresion = (Variable) visitExpresion(ctx.inicio_for().expresion());
@@ -241,7 +310,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
     }
 
     @Override
-    public T visitSwitch_loop_func(tclParser.Switch_loop_funcContext ctx) {
+    public T visitSwitch_loop_func(Switch_loop_funcContext ctx) {
         Variable var = (Variable) visitInicio_switch(ctx.inicio_switch());        
         String nameVar = "-switch";
         funcActual.setVariable(nameVar, var);
@@ -251,7 +320,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
     }
 
     @Override
-    public T visitCase_loop_func(tclParser.Case_loop_funcContext ctx) {
+    public T visitCase_loop_func(Case_loop_funcContext ctx) {
         int valor = (int)((Variable)visitInicio_case(ctx.inicio_case())).getValor();
         Variable temp = (Variable) funcActual.getVarSwitch();
         if(valor == (int)temp.getValor()){
@@ -267,7 +336,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
     }
 
     @Override
-    public T visitCase2_loop_func(tclParser.Case2_loop_funcContext ctx) {
+    public T visitCase2_loop_func(Case2_loop_funcContext ctx) {
         if (ctx.default_loop_func() != null){
             return visitDefault_loop_func(ctx.default_loop_func());
         }
@@ -286,7 +355,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
     }
         
     @Override
-    public T visitDefault_loop_func(tclParser.Default_loop_funcContext ctx) {
+    public T visitDefault_loop_func(Default_loop_funcContext ctx) {
         funcActual.setTable();
         visitCuerpo_loop_func(ctx.cuerpo_loop_func());
         funcActual.removeTable();
@@ -639,7 +708,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 		} else {
 			if (indice != null) { // si se cumple se puede actualizar o un nuevo indice
 				// si se estan intentando acceder a una que no es arreglo -> ERROR
-				if (temp.getClass().getName().equals("business.Variable")) {
+				if (temp.getClass().getName().equals("models.Variable")) {
 					String msj = Error.variableNotArray(nameVar);
                                         Error.printError(msj, VisitorTCL.this.getLocation(ctx.IDENTIFICADOR()));
 					return null;
@@ -651,7 +720,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 					arr.insertIndice(indice.getValor(), new Variable(newValue));
 				}
 			} else {            // se cambia a variable si la que existia era arreglo
-				if (temp.getClass().getName().equals("business.Arreglo")) {
+				if (temp.getClass().getName().equals("models.Arreglo")) {
 					tempTable = selectTable();
 					tempTable.remove(nameVar);
 					tempTable.put(nameVar, new Variable(newValue));
@@ -679,7 +748,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 			return visitValor(ctx.valor());
 		} else if (ctx.agrup() != null) {           // Es una agrupacion por []
 			return visitAgrup(ctx.agrup());
-		}                                           // Si no es un identificador
+		}                                           // Si no, es un identificador
                 return visitIdentificador(ctx.IDENTIFICADOR(), ctx.indice());
 	}
 
@@ -688,7 +757,10 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 		if (ctx.val_indice() != null) {                             // Si se tiene un valor entre los parentesis
 			if (ctx.val_indice().valor() != null)               // Si es de tipo valor el indice
 				return (T) visitValor(ctx.val_indice().valor());			                                        
-                        return (T) visitAgrup(ctx.val_indice().agrup());    // Si no, es de tipo agrupacion
+			else if(ctx.val_indice().IDENTIFICADOR() != null){
+				return visitIdentificador(ctx.val_indice().IDENTIFICADOR(), ctx.val_indice().indice());
+			}
+			return (T) visitAgrup(ctx.val_indice().agrup());    // Si no, es de tipo agrupacion
 		}
 		return null;
 	}
@@ -716,12 +788,25 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 			Collections.reverse(params);
                         funcActual = tableFunctions.get(nameFunc);
                         if (funcActual.verifyParams(params)) {
-                            funcActual.addVariables(params);
                             returnValue = null;
+                            funcActual.setTable();
+                            	funcActual.addArgumentos();
+                            funcActual.addVariables(params);
+//                            System.out.println(funcActual.getTables());
                             visitCuerpo_funcion(funcActual.getBloqueInstruccion());
-                            if (returnValue == null)
-                                return (T) new Variable(Constants.INT, 0);
-                            return (T) returnValue;
+                            funcActual.removeTable();
+                            if(funcActual.getTables().size() == 1){
+                            	
+                            	funcActual = null;
+                            }
+                            
+//                            System.out.println(returnValue);
+                            if (returnValue == null){
+                            	return (T) new Variable(Constants.INT, 0);
+                            }
+                            Variable aux = new Variable(returnValue);
+                            returnValue = null;
+                            return (T) aux;
                         }
                         String msj = Error.paramsNumber(nameFunc);
                         Error.printError(msj, getLocation(ctx.aux_agrup().param_func()));
@@ -736,7 +821,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
                             return null;
                         }
                         // Si variable no es un arreglo -> ERROR
-                        if (!temp.getClass().getName().equals("business.Arreglo")) {
+                        if (!temp.getClass().getName().equals("models.Arreglo")) {
                             String msj = Error.variableNotArray(nameId);
                             Error.printError(msj, VisitorTCL.this.getLocation(ctx.aux_agrup().aux_array().IDENTIFICADOR()));
                             return null;
@@ -745,7 +830,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
                         return (T) new Variable(Constants.INT, arr.getSize());
                     } else {                // Acción de 'exists'
                                             // variable existe y es un arreglo
-                         return (T) new Variable(Constants.INT, (temp != null && temp.getClass().getName().equals("business.Arreglo")) ? 1 : 0);
+                         return (T) new Variable(Constants.INT, (temp != null && temp.getClass().getName().equals("models.Arreglo")) ? 1 : 0);
                     }
                 } else if (ctx.aux_agrup().gets() != null) { // Se va a gets
                     return visitGets(ctx.aux_agrup().gets());
@@ -789,10 +874,8 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 
     @Override
     public T visitGets(GetsContext ctx) {
-        Scanner input = new Scanner(System.in);
-        String result = input.nextLine();
-        input.close();
-        if (result.matches("'-'?[0-9]+")) {                                     // si hace match con la regex es un INT
+        String result = input.nextLine().trim();
+        if (result.matches("-?[0-9]+")) {                                     // si hace match con la regex es un INT
             return (T) new Variable(Constants.INT, Integer.parseInt(result));
         } else if (result.matches("-?[0-9]+.[0-9]+")) {                         // sino, es un DOUBLE
             return (T) new Variable(Constants.DOUBLE, Double.parseDouble(result));
@@ -810,7 +893,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
      /////////////////////////////////////////////////////////////////////////*/
 
     @Override
-    public T visitInicio_while(tclParser.Inicio_whileContext ctx) {
+    public T visitInicio_while(Inicio_whileContext ctx) {
         Variable expresion = (Variable) visitExpresion(ctx.expresion());
         if(expresion.getTipo() != Constants.INT){
             String msj = Error.incompatibleData(Error.ERR_INT, expresion.getTipo());
@@ -820,13 +903,12 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
     }
     
     @Override
-    public T visitR_while(tclParser.R_whileContext ctx) {
+    public T visitR_while(R_whileContext ctx) {
         tables.add(new HashMap<>());        
         Variable expresion = (Variable) visitInicio_while(ctx.inicio_while());
         while((int)expresion.getValor() != 0){
             hasToBreak = false;
             hasToContinue = false;
-//            System.out.println(ctx.cuerpo_loop().getText());
             visitCuerpo_loop(ctx.cuerpo_loop());
             if (hasToBreak){
                 hasToBreak = false;
@@ -1298,7 +1380,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
         }
 
         Object temp = valueID(nameVar);
-        if (temp == null) { // Si se cumple, la cariable no existe
+        if (temp == null) { // Si se cumple, la variable no existe
             String msj = Error.variableNotDeclared(nameVar);
             Error.printError(msj, VisitorTCL.this.getLocation(id_ctx));
             return null;
@@ -1306,7 +1388,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
             if (indice != null) { // Si existe algun indice
 
                 // Es una variable y se esta pasando como arreglo -> ERROR
-                if (temp.getClass().getName().equals("business.Variable")) {
+                if (temp.getClass().getName().equals("models.Variable")) {
                     String msj = Error.variableNotArray(nameVar);
                     Error.printError(msj, VisitorTCL.this.getLocation(id_ctx));
                     return null;
@@ -1324,7 +1406,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
             } else {
                 // Si se esta llamando a una variable pero es un arreglo ->
                 // ERROR
-                if (temp.getClass().getName().equals("business.Arreglo")) {
+                if (temp.getClass().getName().equals("models.Arreglo")) {
                     String msj = Error.variableIsArray(nameVar);
                     Error.printError(msj, VisitorTCL.this.getLocation(id_ctx));
                     return null;
@@ -1343,11 +1425,22 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
         List<Map<String, Object>> ts = tables;
         if (funcActual != null) {
             ts = funcActual.getTables();
-        }
+            ListIterator<Map<String,Object >> tsIt = ts.listIterator(ts.size());
+//            System.out.println(tsIt.hasNext());
+            while (tsIt.hasPrevious()) {
+            	Map<String, Object> table = tsIt.previous();
+//            	System.out.println(table);
+            	if (table.containsKey(id)) {
+            		return (T) table.get(id);
+            	}
+            }
+        } else {
+        	
         for (Map<String, Object> table : ts) {
             if (table.containsKey(id)) {
                 return (T) table.get(id);
             }
+        }
         }
         return null;
     }

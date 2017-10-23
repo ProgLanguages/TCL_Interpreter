@@ -1,18 +1,20 @@
+proc fib { {n} } {
+	
+	#puts $n;
+  if { $n == 1 || $n == 0 } then {
+    return 1;
+  }
+  set a [fib { expr { $n - 1 } } ];
+  
+	puts "a = $a";
+  set b [fib { expr { $n - 2 } } ];
+	
+	puts "b = $b";
 
-
-set i 1;
-while{$i < 5}{
-	set j $i;
-	puts $i;
-	while {$j < 3}{
-		if {$j == 2} then {
-			puts "break $j";
-			break;
-		} else {
-			puts "No break $j";
-		}
-		set j [expr {$j+1}];
-	}
-	set i [expr {$i+1}];
+  return [ expr { $a + $b} ];
 }
 
+for {set i 0}{ $i < 10 }{ incr i} {
+    puts "fib $i";
+    puts [fib {$i} ];
+}

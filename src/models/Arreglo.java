@@ -1,12 +1,12 @@
-package business;
+package models;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Arreglo {
 
-	int size;
-	Map<Object, Variable> valsArreglo;
+	private int size;
+	private Map<Object, Variable> valsArreglo;
 	
 	public Arreglo(){
 		valsArreglo = new HashMap<>();
