@@ -19,13 +19,16 @@ import classes.tclParser.AgrupContext;
 import classes.tclParser.Asig_forContext;
 import classes.tclParser.AsignacionContext;
 import classes.tclParser.Case2Context;
+import classes.tclParser.Case2_funcionContext;
 import classes.tclParser.Case2_loopContext;
 import classes.tclParser.Case_funcionContext;
 import classes.tclParser.Case_loopContext;
+import classes.tclParser.Cuerpo_funcionContext;
 import classes.tclParser.Cuerpo_loopContext;
 import classes.tclParser.Dec_forContext;
 import classes.tclParser.DeclaracionContext;
 import classes.tclParser.Declaracion_funcionContext;
+import classes.tclParser.Default_funcionContext;
 import classes.tclParser.Default_loopContext;
 import classes.tclParser.Else_funcionContext;
 import classes.tclParser.ElseifContext;
@@ -58,6 +61,7 @@ import classes.tclParser.R_defaultContext;
 import classes.tclParser.R_elseContext;
 import classes.tclParser.R_forContext;
 import classes.tclParser.R_ifContext;
+import classes.tclParser.R_returnContext;
 import classes.tclParser.R_switchContext;
 import classes.tclParser.Switch_funcionContext;
 import classes.tclParser.Switch_loopContext;
@@ -69,6 +73,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
     List<Map<String, Object>> tables = new ArrayList<>();
     Map<String, Subrutina> tableFunctions = new HashMap<>();
     Subrutina funcActual = null;
+    Variable returnValue = null;
     
     boolean hasToBreak;
     boolean hasToContinue;
@@ -106,7 +111,10 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 	public T visitIf_funcion(If_funcionContext ctx) {
 		int result = (int) (((Variable) visitInicio_if(ctx.inicio_if())).getValor());
 		if (result == 1) {
-			return visitCuerpo_funcion(ctx.cuerpo_funcion());
+			funcActual.setTable();
+			visitCuerpo_funcion(ctx.cuerpo_funcion());
+			funcActual.removeTable();
+			return null;
 		} else {
 			return visitElseif_funcion(ctx.elseif_funcion());
 		}
@@ -119,7 +127,10 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 		} else {
 			int result = (int) (((Variable) visitInicio_elseif(ctx.inicio_elseif())).getValor());
 			if (result == 1) {
-				return visitCuerpo_funcion(ctx.cuerpo_funcion());
+				funcActual.setTable();
+				visitCuerpo_funcion(ctx.cuerpo_funcion());
+				funcActual.removeTable();
+				return null;
 			} else {
 				return visitElseif_funcion(ctx.elseif_funcion());
 			}
@@ -129,31 +140,89 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 	@Override
 	public T visitElse_funcion(Else_funcionContext ctx) {
 		if (ctx.inicio_else() != null) {
-			return visitCuerpo_funcion(ctx.cuerpo_funcion());
-		} else {
-			return null;
+			funcActual.setTable();
+			visitCuerpo_funcion(ctx.cuerpo_funcion());
+			funcActual.removeTable();			
 		}
+		return null;
 	}
 
 	@Override
 	public T visitSwitch_funcion(Switch_funcionContext ctx) {
 		Variable var = (Variable) visitInicio_switch(ctx.inicio_switch());
-		Map<String, Object> tempTable = tables.get(tables.size() - 1);
 
-		String nameVar = "-switch" + ctx.inicio_switch().IDENTIFICADOR().getText();
-		tempTable.put(nameVar, var);
+		String nameVar = "-switch";
+		funcActual.setVariable(nameVar, var);	
 		visitCase_funcion(ctx.case_funcion());
-
-		tempTable.remove(nameVar);
-
+		funcActual.removeTable();
 		return null;
 	}
 
 	@Override
 	public T visitCase_funcion(Case_funcionContext ctx) {
-		Variable value = (Variable) visitInicio_case(ctx.inicio_case());
-
-		return super.visitCase_funcion(ctx);
+		int valor = (int)((Variable)visitInicio_case(ctx.inicio_case())).getValor();
+		Variable temp = (Variable) funcActual.getVarSwitch();
+		if(valor == (int)temp.getValor()){
+			funcActual.setTable();
+			visitCuerpo_funcion(ctx.cuerpo_funcion());
+			funcActual.removeTable();
+		} else {
+			if(ctx.case2_funcion() != null){
+				return visitCase2_funcion(ctx.case2_funcion());				
+			} 
+		}		
+		return null;
+	}
+	
+	@Override
+	public T visitCase2_funcion(Case2_funcionContext ctx) {
+		if(ctx.default_funcion() != null){
+			return visitDefault_funcion(ctx.default_funcion());
+		} else {
+			int valor = (int) ((Variable)visitInicio_case(ctx.inicio_case())).getValor();
+			Variable temp = (Variable) funcActual.getVarSwitch();
+			if(valor == (int) temp.getValor()){
+				funcActual.setTable();
+				visitCuerpo_funcion(ctx.cuerpo_funcion());
+				funcActual.removeTable();
+			} else {
+				if(ctx.case2_funcion() != null){
+					return visitCase2_funcion(ctx.case2_funcion());
+				} 
+			}		
+			return null;			
+		}
+	}
+	
+	@Override
+	public T visitDefault_funcion(Default_funcionContext ctx) {
+		funcActual.setTable();
+		visitCuerpo_funcion(ctx.cuerpo_funcion());
+		funcActual.removeTable();		
+		return null;
+	}
+	
+	@Override
+	public T visitCuerpo_funcion(Cuerpo_funcionContext ctx) {		
+		if(returnValue != null){
+			return null;
+		}
+		
+		if(ctx.r_return() != null){
+			returnValue = (Variable)visitR_return(ctx.r_return());
+			return null;
+		} else {
+			return visitChildren(ctx);
+		}
+	}
+	
+	@Override
+	public T visitR_return(R_returnContext ctx) {
+		if(ctx.value_return() != null){
+			return (T) visitAsignacion(ctx.value_return().asignacion());
+		} else {
+			return (T) new Variable(Constants.INT, 0);
+		}
 	}
 	
     /*//////////////////////////////////////////////////////////////////////////

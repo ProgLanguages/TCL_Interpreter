@@ -409,14 +409,7 @@ public class tclBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements tc
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitReturn_loop(tclParser.Return_loopContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitR2(tclParser.R2Context ctx) { return visitChildren(ctx); }
+	@Override public T visitValue_return(tclParser.Value_returnContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
