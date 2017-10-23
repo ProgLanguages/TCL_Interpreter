@@ -57,4 +57,16 @@ public class Subrutina {
         return bloqueInstruccion;
     }
 	
+	public void setVariable(String name, Variable var){
+		tableVars.get(tableVars.size()-1).put(name, var);
+	}
+	
+	public void removeVariable(String name){
+		tableVars.get(tableVars.size()-1).remove(name);
+	}
+	
+	public Object getVarSwitch(){
+		return tableVars.get(tableVars.size()-1).get("-switch");
+	}
+	
 }

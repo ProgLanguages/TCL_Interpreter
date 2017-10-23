@@ -22,7 +22,7 @@ for_funcion	:	inicio_for cuerpo_loop_func '}'  ;
 while_funcion	:	inicio_while cuerpo_loop_func '}'  ;
 
 cuerpo_loop_func	:	r_break cuerpo_loop_func | r_continue cuerpo_loop_func | declaracion cuerpo_loop_func 
-					| gets ';' cuerpo_loop_func | puts cuerpo_loop_func | return_loop cuerpo_loop_func 
+					| gets ';' cuerpo_loop_func | puts cuerpo_loop_func | r_return cuerpo_loop_func 
 					| if_loop_func cuerpo_loop_func | switch_loop_func cuerpo_loop_func | for_funcion cuerpo_loop_func 
 					| while_funcion cuerpo_loop_func | agrup ';' cuerpo_loop_func |  ;
 
@@ -88,9 +88,8 @@ incremento	:	VALOR_ENTERO |  ;
 
 r_break	:	'break' ';'  ;
 r_continue	:	'continue' ';'  ;
-r_return	:	'return' r2 ';'  ;
-return_loop	:	'return' r2 ';'  ;
-r2	:	asignacion |  ;
+r_return	:	'return' value_return ';'  ;
+value_return	:	asignacion |  ;
 
 expr	:	'expr' '{' expresion '}'  ;
 asig_for	:	VALOR_ENTERO | '$' IDENTIFICADOR indice | expr  ;

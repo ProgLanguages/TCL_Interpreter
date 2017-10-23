@@ -568,25 +568,15 @@ public interface tclListener extends ParseTreeListener {
 	 */
 	void exitR_return(tclParser.R_returnContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link tclParser#return_loop}.
+	 * Enter a parse tree produced by {@link tclParser#value_return}.
 	 * @param ctx the parse tree
 	 */
-	void enterReturn_loop(tclParser.Return_loopContext ctx);
+	void enterValue_return(tclParser.Value_returnContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link tclParser#return_loop}.
+	 * Exit a parse tree produced by {@link tclParser#value_return}.
 	 * @param ctx the parse tree
 	 */
-	void exitReturn_loop(tclParser.Return_loopContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link tclParser#r2}.
-	 * @param ctx the parse tree
-	 */
-	void enterR2(tclParser.R2Context ctx);
-	/**
-	 * Exit a parse tree produced by {@link tclParser#r2}.
-	 * @param ctx the parse tree
-	 */
-	void exitR2(tclParser.R2Context ctx);
+	void exitValue_return(tclParser.Value_returnContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link tclParser#expr}.
 	 * @param ctx the parse tree

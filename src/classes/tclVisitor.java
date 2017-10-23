@@ -347,17 +347,11 @@ public interface tclVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitR_return(tclParser.R_returnContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link tclParser#return_loop}.
+	 * Visit a parse tree produced by {@link tclParser#value_return}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitReturn_loop(tclParser.Return_loopContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link tclParser#r2}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitR2(tclParser.R2Context ctx);
+	T visitValue_return(tclParser.Value_returnContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link tclParser#expr}.
 	 * @param ctx the parse tree
