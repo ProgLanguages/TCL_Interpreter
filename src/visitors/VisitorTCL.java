@@ -1,74 +1,20 @@
 package visitors;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import business.Arreglo;
-import business.Constants;
+import business.*;
 import business.Error;
-import business.Subrutina;
-import business.Variable;
 import classes.tclBaseVisitor;
 import classes.tclParser;
-import classes.tclParser.AgrupContext;
-import classes.tclParser.Asig_forContext;
-import classes.tclParser.AsignacionContext;
-import classes.tclParser.Case2Context;
-import classes.tclParser.Case2_funcionContext;
-import classes.tclParser.Case2_loopContext;
-import classes.tclParser.Case_funcionContext;
-import classes.tclParser.Case_loopContext;
-import classes.tclParser.Cuerpo_funcionContext;
-import classes.tclParser.Cuerpo_loopContext;
-import classes.tclParser.Dec_forContext;
-import classes.tclParser.DeclaracionContext;
-import classes.tclParser.Declaracion_funcionContext;
-import classes.tclParser.Default_funcionContext;
-import classes.tclParser.Default_loopContext;
-import classes.tclParser.Else_funcionContext;
-import classes.tclParser.ElseifContext;
-import classes.tclParser.Elseif_funcionContext;
-import classes.tclParser.Elseif_loopContext;
-import classes.tclParser.Exp_addContext;
-import classes.tclParser.Exp_andContext;
-import classes.tclParser.Exp_igContext;
-import classes.tclParser.Exp_mulContext;
-import classes.tclParser.Exp_orContext;
-import classes.tclParser.Exp_potContext;
-import classes.tclParser.Exp_relContext;
-import classes.tclParser.Exp_unaContext;
-import classes.tclParser.GetsContext;
-import classes.tclParser.If_funcionContext;
-import classes.tclParser.If_loopContext;
-import classes.tclParser.IncrementoContext;
-import classes.tclParser.IndiceContext;
-import classes.tclParser.InicioContext;
-import classes.tclParser.Inicio_caseContext;
-import classes.tclParser.Inicio_elseifContext;
-import classes.tclParser.Inicio_ifContext;
-import classes.tclParser.Inicio_switchContext;
-import classes.tclParser.Param_funcContext;
-import classes.tclParser.PutsContext;
-import classes.tclParser.R_breakContext;
-import classes.tclParser.R_caseContext;
-import classes.tclParser.R_continueContext;
-import classes.tclParser.R_defaultContext;
-import classes.tclParser.R_elseContext;
-import classes.tclParser.R_forContext;
-import classes.tclParser.R_ifContext;
-import classes.tclParser.R_returnContext;
-import classes.tclParser.R_switchContext;
-import classes.tclParser.Switch_funcionContext;
-import classes.tclParser.Switch_loopContext;
-import classes.tclParser.TermContext;
-import classes.tclParser.ValorContext;
-import java.util.Collections;
-import org.antlr.v4.runtime.ParserRuleContext;
+import classes.tclParser.*;
 
 public class VisitorTCL<T> extends tclBaseVisitor<T> {
 
@@ -128,7 +74,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 	@Override
 	public T visitIf_funcion(If_funcionContext ctx) {
 		int result = (int) (((Variable) visitInicio_if(ctx.inicio_if())).getValor());
-		if (result == 1) {
+		if (result != 0) {
 			funcActual.setTable();
 			visitCuerpo_funcion(ctx.cuerpo_funcion());
 			funcActual.removeTable();
@@ -144,7 +90,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 			return visitElse_funcion(ctx.else_funcion());
 		} else {
 			int result = (int) (((Variable) visitInicio_elseif(ctx.inicio_elseif())).getValor());
-			if (result == 1) {
+			if (result != 0) {
 				funcActual.setTable();
 				visitCuerpo_funcion(ctx.cuerpo_funcion());
 				funcActual.removeTable();
@@ -242,7 +188,64 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 			return (T) new Variable(Constants.INT, 0);
 		}
 	}
+
+	@Override
+	public T visitIf_loop_func(If_loop_funcContext ctx) {
+		int result = (int) (((Variable) visitInicio_if(ctx.inicio_if())).getValor());
+		if (result != 0) {
+			funcActual.setTable();
+			visitCuerpo_loop_func(ctx.cuerpo_loop_func());
+			funcActual.removeTable();
+			return null;
+		} else {
+			return visitElseif_loop_func(ctx.elseif_loop_func());
+		}
+	}
 	
+	@Override
+	public T visitElseif_loop_func(Elseif_loop_funcContext ctx) {
+		if (ctx.else_loop_func() != null) {
+			return visitElse_loop_func(ctx.else_loop_func());
+		} else {
+			int result = (int) (((Variable) visitInicio_elseif(ctx.inicio_elseif())).getValor());
+			if (result != 0) {
+				funcActual.setTable();
+				visitCuerpo_loop_func(ctx.cuerpo_loop_func());
+				funcActual.removeTable();
+				return null;
+			} else {
+				return visitElseif_loop_func(ctx.elseif_loop_func());
+			}
+		}
+	}
+	
+	@Override
+	public T visitElse_loop_func(Else_loop_funcContext ctx) {
+		if (ctx.inicio_else() != null) {
+			funcActual.setTable();
+			visitCuerpo_loop_func(ctx.cuerpo_loop_func());
+			funcActual.removeTable();			
+		}
+		return null;
+	}
+	
+	@Override
+	public T visitCuerpo_loop_func(Cuerpo_loop_funcContext ctx) {
+		if(returnValue != null || hasToBreak || hasToContinue){
+			return null;
+		}
+		
+		if(ctx.r_break() != null){
+			return visitR_break(ctx.r_break());
+		} else if(ctx.r_continue() != null){
+			return visitR_continue(ctx.r_continue());
+		} else if(ctx.r_return() != null){
+			returnValue = (Variable)visitR_return(ctx.r_return());
+			return null;
+		} else {
+			return visitChildren(ctx);
+		}
+	}
     /*//////////////////////////////////////////////////////////////////////////
                                     _   ___ 
                                    | | | __|
