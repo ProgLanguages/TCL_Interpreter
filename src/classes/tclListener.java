@@ -797,4 +797,54 @@ public interface tclListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitTerm(tclParser.TermContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link tclParser#op_ig}.
+	 * @param ctx the parse tree
+	 */
+	void enterOp_ig(tclParser.Op_igContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link tclParser#op_ig}.
+	 * @param ctx the parse tree
+	 */
+	void exitOp_ig(tclParser.Op_igContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link tclParser#op_rel}.
+	 * @param ctx the parse tree
+	 */
+	void enterOp_rel(tclParser.Op_relContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link tclParser#op_rel}.
+	 * @param ctx the parse tree
+	 */
+	void exitOp_rel(tclParser.Op_relContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link tclParser#op_add}.
+	 * @param ctx the parse tree
+	 */
+	void enterOp_add(tclParser.Op_addContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link tclParser#op_add}.
+	 * @param ctx the parse tree
+	 */
+	void exitOp_add(tclParser.Op_addContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link tclParser#op_mul}.
+	 * @param ctx the parse tree
+	 */
+	void enterOp_mul(tclParser.Op_mulContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link tclParser#op_mul}.
+	 * @param ctx the parse tree
+	 */
+	void exitOp_mul(tclParser.Op_mulContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link tclParser#op_una}.
+	 * @param ctx the parse tree
+	 */
+	void enterOp_una(tclParser.Op_unaContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link tclParser#op_una}.
+	 * @param ctx the parse tree
+	 */
+	void exitOp_una(tclParser.Op_unaContext ctx);
 }

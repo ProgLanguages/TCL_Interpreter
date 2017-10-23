@@ -14,6 +14,7 @@ import business.Error;
 import business.Subrutina;
 import business.Variable;
 import classes.tclBaseVisitor;
+import classes.tclParser;
 import classes.tclParser.AgrupContext;
 import classes.tclParser.Asig_forContext;
 import classes.tclParser.AsignacionContext;
@@ -56,32 +57,33 @@ import classes.tclParser.ValorContext;
 
 public class VisitorTCL<T> extends tclBaseVisitor<T> {
 
-	List<Map<String, Object>> tables = new ArrayList<>();
-	Map<String, Subrutina> tableFunctions = new HashMap<>();
-	Subrutina funcActual = null;
+    List<Map<String, Object>> tables = new ArrayList<>();
+    Map<String, Subrutina> tableFunctions = new HashMap<>();
+    Subrutina funcActual = null;
 
-	public T visitInicio(InicioContext ctx) {
-		tables.add(new HashMap<>());
-		return super.visitChildren(ctx);
-	}
+    public T visitInicio(InicioContext ctx) {
+        tables.add(new HashMap<>());
+        return super.visitChildren(ctx);
+    }
 
-	public T visitDeclaracion_funcion(Declaracion_funcionContext ctx) {
-		if (ctx.IDENTIFICADOR() != null) {
+    public T visitDeclaracion_funcion(Declaracion_funcionContext ctx) {
+        if (ctx.IDENTIFICADOR() != null) {
 
-			String nameId = ctx.IDENTIFICADOR().getText();
-			// Si ya existia una funcion con el mismo nombre
-			if (tableFunctions.containsKey(nameId)) {
-				String msj = Error.repeatedFunction(nameId);
-				int line = ctx.IDENTIFICADOR().getSymbol().getLine();
-				int col = ctx.IDENTIFICADOR().getSymbol().getCharPositionInLine() + 1;
-				Error.printError(msj, line, col);
-				return null;
-			} else {
-				tableFunctions.put(nameId, new Subrutina(ctx.cuerpo_funcion()));
+            String nameId = ctx.IDENTIFICADOR().getText();
+            // Si ya existia una funcion con el mismo nombre
+            if (tableFunctions.containsKey(nameId)) {
+                String msj = Error.repeatedFunction(nameId);
+                int line = ctx.IDENTIFICADOR().getSymbol().getLine();
+                int col = ctx.IDENTIFICADOR().getSymbol().getCharPositionInLine() + 1;
+                Error.printError(msj, line, col);
+                return null;
+            } else {
+                tableFunctions.put(nameId, new Subrutina(ctx.cuerpo_funcion()));
 
-				/*
+                /*
 				 * Hay que obetener los argumentos, y ponerle esos argumentos a
 				 * la funcion
+<<<<<<< HEAD
 				 */
 			}
 		}
@@ -143,6 +145,14 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 		return super.visitCase_funcion(ctx);
 	}
 	
+    /*//////////////////////////////////////////////////////////////////////////
+    _   ___ 
+   | | | __|
+   | | | _| 
+   |_| |_|  
+
+/////////////////////////////////////////////////////////////////////////*/
+	
 	@Override
 	public T visitR_if(R_ifContext ctx) {
 		int result = (int) (((Variable) visitInicio_if(ctx.inicio_if())).getValor());
@@ -182,6 +192,14 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 		}
 		return null;
 	}
+	
+    /*//////////////////////////////////////////////////////////////////////////
+    __   _   _   _   _____    ___  _  _ 
+  /' _/ | | | | | | |_   _|  / _/ | || |
+  `._`. | 'V' | | |   | |   | \__ | >< |
+  |___/ !_/ \_! |_|   |_|    \__/ |_||_|
+
+/////////////////////////////////////////////////////////////////////////*/	
 	
 	@Override
 	public T visitR_switch(R_switchContext ctx) {
@@ -238,7 +256,13 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 		tables.remove(tables.size()-1);		
 		return null;
 	}
-
+	/*
+		 ___    __    ___ 
+		| __|  /__\  | _ \
+		| _|  | \/ | | v /
+		|_|    \__/  |_|_\
+	 */
+		
 	@Override
 	public T visitR_for(R_forContext ctx) {
 		tables.add(new HashMap<>());
@@ -296,7 +320,6 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 			return (T) new Variable(Constants.INT, 1);
 		}
 	}
-	
 	
 	@Override
 	public T visitDec_for(Dec_forContext ctx) {
@@ -521,571 +544,595 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 			String nameFunc = ctx.aux_agrup().IDENTIFICADOR().getText();
 
 			List<Variable> params = (List<Variable>) visitParam_func(ctx.aux_agrup().param_func());
-
+    
 			/*
 			 * En esta parte hay que verificar primero que el numero de
 			 * parametros sea correcto Luego hay que pasar a ejecutar la funcion
 			 * y retornar ese valor devuelto
-			 */
-			return (T) new Variable(Constants.INT, 0);
-		} else if (ctx.aux_agrup().aux_array() != null) { // Si hay dentro una
-															// accion de array
-			String command = ctx.aux_agrup().aux_array().getStart().getText();
-			String nameId = ctx.aux_agrup().aux_array().IDENTIFICADOR().getText();
-			Object temp = valueID(nameId);
+             */
+            return (T) new Variable(Constants.INT, 0);
+        } else if (ctx.aux_agrup().aux_array() != null) { // Si hay dentro una
+            // accion de array
+            String command = ctx.aux_agrup().aux_array().getStart().getText();
+            String nameId = ctx.aux_agrup().aux_array().IDENTIFICADOR().getText();
+            Object temp = valueID(nameId);
 
-			if (command.equals("size")) { // Realiza la accion de 'size'
-				if (temp == null) { // Si la variable no existe -> ERROR
-					String msj = Error.variableNotDeclared(nameId);
-					int line = ctx.aux_agrup().aux_array().IDENTIFICADOR().getSymbol().getLine();
-					int col = ctx.aux_agrup().aux_array().IDENTIFICADOR().getSymbol().getCharPositionInLine() + 1;
-					Error.printError(msj, line, col);
-					return null;
-				}
+            if (command.equals("size")) { // Realiza la accion de 'size'
+                if (temp == null) { // Si la variable no existe -> ERROR
+                    String msj = Error.variableNotDeclared(nameId);
+                    int line = ctx.aux_agrup().aux_array().IDENTIFICADOR().getSymbol().getLine();
+                    int col = ctx.aux_agrup().aux_array().IDENTIFICADOR().getSymbol().getCharPositionInLine() + 1;
+                    Error.printError(msj, line, col);
+                    return null;
+                }
 
-				// Si variable no es un arreglo -> ERROR
-				if (!temp.getClass().getName().equals("business.Arreglo")) {
-					String msj = Error.variableNotArray(nameId);
-					int line = ctx.aux_agrup().aux_array().IDENTIFICADOR().getSymbol().getLine();
-					int col = ctx.aux_agrup().aux_array().IDENTIFICADOR().getSymbol().getCharPositionInLine() + 1;
-					Error.printError(msj, line, col);
-					return null;
-				} else {
-					Arreglo arr = (Arreglo) temp;
-					return (T) new Variable(Constants.INT, arr.getSize());
-				}
-			} else { // es la accion de 'exists'
-				// variable existe y es un arreglo
-				if (temp != null && temp.getClass().getName().equals("business.Arreglo")) {
-					return (T) new Variable(Constants.INT, 1);
-				} else {
-					return (T) new Variable(Constants.INT, 0);
-				}
-			}
+                // Si variable no es un arreglo -> ERROR
+                if (!temp.getClass().getName().equals("business.Arreglo")) {
+                    String msj = Error.variableNotArray(nameId);
+                    int line = ctx.aux_agrup().aux_array().IDENTIFICADOR().getSymbol().getLine();
+                    int col = ctx.aux_agrup().aux_array().IDENTIFICADOR().getSymbol().getCharPositionInLine() + 1;
+                    Error.printError(msj, line, col);
+                    return null;
+                } else {
+                    Arreglo arr = (Arreglo) temp;
+                    return (T) new Variable(Constants.INT, arr.getSize());
+                }
+            } else { // es la accion de 'exists'
+                // variable existe y es un arreglo
+                if (temp != null && temp.getClass().getName().equals("business.Arreglo")) {
+                    return (T) new Variable(Constants.INT, 1);
+                } else {
+                    return (T) new Variable(Constants.INT, 0);
+                }
+            }
 
-		} else if (ctx.aux_agrup().gets() != null) { // Se va a gets
-			return visitGets(ctx.aux_agrup().gets());
-		}
-		return null;
-	}
+        } else if (ctx.aux_agrup().gets() != null) { // Se va a gets
+            return visitGets(ctx.aux_agrup().gets());
+        }
+        return null;
+    }
 
-	public T visitValor(ValorContext ctx) {
-		if (ctx.VALOR_DOUBLE() != null) { // Mira si es un double
-			return (T) new Variable(Constants.DOUBLE, Double.parseDouble(ctx.VALOR_DOUBLE().getText()));
-		} else if (ctx.VALOR_ENTERO() != null) { // Mira si es un Entero
-			return (T) new Variable(Constants.INT, Integer.parseInt(ctx.VALOR_ENTERO().getText()));
-		}
+    public T visitValor(ValorContext ctx) {
+        if (ctx.VALOR_DOUBLE() != null) { // Mira si es un double
+            return (T) new Variable(Constants.DOUBLE, Double.parseDouble(ctx.VALOR_DOUBLE().getText()));
+        } else if (ctx.VALOR_ENTERO() != null) { // Mira si es un Entero
+            return (T) new Variable(Constants.INT, Integer.parseInt(ctx.VALOR_ENTERO().getText()));
+        }
 
-		// Hace la parte del String - Hay que mejorar, funciona regular
-		String temp = ctx.VALOR_STRING().getText();
-		String[] words = temp.substring(1, temp.length() - 1).split(" ");
-		StringBuilder result = new StringBuilder("");
-		temp = "";
-		Object res;
-		int colTemp = 0;
-		for (String word : words) {
-			if (!word.isEmpty() && word.charAt(0) == '$') {
-				temp = word.substring(1);
-				res = valueID(temp);
-				if (res != null) {
-					Variable val = (Variable) res;
-					result.append(val.getValor().toString() + " ");
-				} else {
-					String msj = Error.variableNotDeclared(temp);
-					int line = ctx.VALOR_STRING().getSymbol().getLine();
-					int col = ctx.VALOR_STRING().getSymbol().getCharPositionInLine();
-					col += 2 + colTemp;
-					Error.printError(msj, line, col);
-				}
-			} else {
-				result.append((String) word + " ");
-			}
-			colTemp += word.length() + 1;
-		}
-		return (T) new Variable(Constants.STRING, result.toString());
-	}
+        // Hace la parte del String - Hay que mejorar, funciona regular
+        String temp = ctx.VALOR_STRING().getText();
+        String[] words = temp.substring(1, temp.length() - 1).split(" ");
+        StringBuilder result = new StringBuilder("");
+        temp = "";
+        Object res;
+        int colTemp = 0;
+        for (String word : words) {
+            if (!word.isEmpty() && word.charAt(0) == '$') {
+                temp = word.substring(1);
+                res = valueID(temp);
+                if (res != null) {
+                    Variable val = (Variable) res;
+                    result.append(val.getValor().toString() + " ");
+                } else {
+                    String msj = Error.variableNotDeclared(temp);
+                    int line = ctx.VALOR_STRING().getSymbol().getLine();
+                    int col = ctx.VALOR_STRING().getSymbol().getCharPositionInLine();
+                    col += 2 + colTemp;
+                    Error.printError(msj, line, col);
+                }
+            } else {
+                result.append((String) word + " ");
+            }
+            colTemp += word.length() + 1;
+        }
+        return (T) new Variable(Constants.STRING, result.toString());
+    }
 
-	public T visitGets(GetsContext ctx) {
-		Scanner input = new Scanner(System.in);
-		String result = input.nextLine();
-		input.close();
+    public T visitGets(GetsContext ctx) {
+        Scanner input = new Scanner(System.in);
+        String result = input.nextLine();
+        input.close();
 
-		if (result.matches("'-'?[0-9]+")) { // si hace match con la regex es un
-											// INT
-			return (T) new Variable(Constants.INT, Integer.parseInt(result));
-		} else if (result.matches("-?[0-9]+.[0-9]+")) { // si no, es un Double
-			return (T) new Variable(Constants.DOUBLE, Double.parseDouble(result));
-		} else { // si no es un string
-			return (T) new Variable(Constants.STRING, result);
-		}
-	}
+        if (result.matches("'-'?[0-9]+")) { // si hace match con la regex es un
+            // INT
+            return (T) new Variable(Constants.INT, Integer.parseInt(result));
+        } else if (result.matches("-?[0-9]+.[0-9]+")) { // si no, es un Double
+            return (T) new Variable(Constants.DOUBLE, Double.parseDouble(result));
+        } else { // si no es un string
+            return (T) new Variable(Constants.STRING, result);
+        }
+    }
+    
+    /*//////////////////////////////////////////////////////////////////////////
+                            _   _   _  _   _   _     ___ 
+                           | | | | | || | | | | |   | __|
+                           | 'V' | | >< | | | | |_  | _| 
+                           !_/ \_! |_||_| |_| |___| |___|
+    
+     /////////////////////////////////////////////////////////////////////////*/
+    
+    @Override
+    public T visitInicio_while(tclParser.Inicio_whileContext ctx) {
+        return null;
+    }
 
-	/*
-	 * #########################################################################
-	 * #####
-	 * #########################################################################
-	 * #######
-	 * #########################################################################
-	 * ####### ### ### ### ****** * * ****** ****** ****** ****** ****** ******
-	 * ** ** ### ### ** * * ** ** ** ** ** ** ** ** ** *** ** ### ### ** * * **
-	 * ** ** ** ** ** ** ** ** *** ** ### ### ****** * ****** ****** ******
-	 * ****** ** ** ** ****** ### ### ** * * ** **** ** ** ** ** ** ** *** ###
-	 * ### ** * * ** ** ** ** ** ** ** ** ** *** ### ### ****** * * ** ** **
-	 * ****** ****** ****** ****** ** ** ### ### ###
-	 * #########################################################################
-	 * #######
-	 * #########################################################################
-	 * #######
-	 * #########################################################################
-	 * #####
-	 */
+    @Override
+    public T visitR_while(tclParser.R_whileContext ctx) {
+        return null;
+    }
 
-	public T visitExp_or(Exp_orContext ctx) {
-		Variable var1, var2 = (Variable) visitExp_and(ctx.exp_and()), var3;
-		if (ctx.exp_or() != null) {
-			var1 = (Variable) visitExp_or(ctx.exp_or());
-			var3 = new Variable(Constants.INT, null);
-			if (var1.getTipo() == Constants.INT && var2.getTipo() == Constants.INT) {
-				var3.setValor((!((Integer) var1.getValor()).equals(0) || !((Integer) var2.getValor()).equals(0))
-						? (Object) 1 : (Object) 0);
-			} else {
-				String tipo;
-				if (var1.getTipo() != Constants.STRING) {
-					tipo = (var1.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_INT;
-				} else {
-					tipo = (var2.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_INT;
-				}
-				String msj = Error.incompatibleData(Error.ERR_STRING, tipo);
-				int line = (var1.getTipo() != Constants.STRING) ? ctx.exp_or().getStart().getLine()
-						: ctx.exp_and().getStart().getLine(),
-						col = (var1.getTipo() != Constants.STRING) ? ctx.exp_or().getStart().getCharPositionInLine()
-								: ctx.exp_and().getStart().getCharPositionInLine();
-				Error.printError(msj, line, col);
-			}
-			return (T) var3;
-		}
-		return (T) var2;
-	}
+    /*//////////////////////////////////////////////////////////////////////////
+        ___  __   __  ___   ___   ___    __   _    __    __  _   ___    __ 
+       | __| \ \_/ / | _,\ | _ \ | __| /' _/ | |  /__\  |  \| | | __| /' _/
+       | _|   > , <  | v_/ | v / | _|  `._`. | | | \/ | | | ' | | _|  `._`.
+       |___| /_/ \_\ |_|   |_|_\ |___| |___/ |_|  \__/  |_|\__| |___| |___/
+    
+     /////////////////////////////////////////////////////////////////////////*/
+    
+    public T visitExp_or(Exp_orContext ctx) {
+        Variable var1, var2 = (Variable) visitExp_and(ctx.exp_and()), var3;
+        if (ctx.exp_or() != null) {
+            var1 = (Variable) visitExp_or(ctx.exp_or());
+            var3 = new Variable(Constants.INT, null);
+            if (var1.getTipo() == Constants.INT && var2.getTipo() == Constants.INT) {
+                var3.setValor((!((Integer) var1.getValor()).equals(0) || !((Integer) var2.getValor()).equals(0))
+                        ? (Object) 1 : (Object) 0);
+            } else {
+                String tipo;
+                int line, col;
+                if (var1.getTipo() != Constants.INT) {
+                    line = ctx.exp_or().getStart().getLine();
+                    col = ctx.exp_or().getStart().getCharPositionInLine();
+                    tipo = (var1.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_STRING;
+                } else {
+                    line = ctx.exp_and().getStart().getLine();
+                    col = ctx.exp_and().getStart().getCharPositionInLine();
+                    tipo = (var2.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_STRING;
+                }
+                String msj = Error.incompatibleData(Error.ERR_INT, tipo);
+                Error.printError(msj, line, col + 1);
+            }
+            return (T) var3;
+        }
+        return (T) var2;
+    }
 
-	public T visitExp_and(Exp_andContext ctx) {
-		Variable var1, var2 = (Variable) visitExp_ig(ctx.exp_ig()), var3;
-		if (ctx.exp_and() != null) {
-			var1 = (Variable) visitExp_and(ctx.exp_and());
-			var3 = new Variable(Constants.INT, null);
-			if (var1.getTipo() == Constants.INT && var2.getTipo() == Constants.INT) {
-				var3.setValor((!((Integer) var1.getValor()).equals(0) && !((Integer) var2.getValor()).equals(0))
-						? (Object) 1 : (Object) 0);
-			} else {
-				String tipo;
-				if (var1.getTipo() != Constants.STRING) {
-					tipo = (var1.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_INT;
-				} else {
-					tipo = (var2.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_INT;
-				}
-				String msj = Error.incompatibleData(Error.ERR_STRING, tipo);
-				int line = (var1.getTipo() != Constants.STRING) ? ctx.exp_and().getStart().getLine()
-						: ctx.exp_ig().getStart().getLine(),
-						col = (var1.getTipo() != Constants.STRING) ? ctx.exp_and().getStart().getCharPositionInLine()
-								: ctx.exp_ig().getStart().getCharPositionInLine();
-				Error.printError(msj, line, col);
-			}
-			return (T) var3;
-		}
-		return (T) var2;
-	}
+    public T visitExp_and(Exp_andContext ctx) {
+        Variable var1, var2 = (Variable) visitExp_ig(ctx.exp_ig()), var3;
+        if (ctx.exp_and() != null) {
+            var1 = (Variable) visitExp_and(ctx.exp_and());
+            var3 = new Variable(Constants.INT, null);
+            if (var1.getTipo() == Constants.INT && var2.getTipo() == Constants.INT) {
+                var3.setValor((!((Integer) var1.getValor()).equals(0) && !((Integer) var2.getValor()).equals(0))
+                        ? (Object) 1 : (Object) 0);
+            } else {
+                String tipo;
+                int line, col;
+                if (var1.getTipo() != Constants.INT) {
+                    line = ctx.exp_and().getStart().getLine();
+                    col = ctx.exp_and().getStart().getCharPositionInLine();
+                    tipo = (var1.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_STRING;
+                } else {
+                    line = ctx.exp_ig().getStart().getLine();
+                    col = ctx.exp_ig().getStart().getCharPositionInLine();
+                    tipo = (var2.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_STRING;
+                }
+                String msj = Error.incompatibleData(Error.ERR_INT, tipo);
+                Error.printError(msj, line, col + 1);
+            }
+            return (T) var3;
+        }
+        return (T) var2;
+    }
 
-	public T visitExp_ig(Exp_igContext ctx) {
-		Variable var1, var2 = (Variable) visitExp_rel(ctx.exp_rel()), var3;
-		if (ctx.exp_ig() != null) {
-			var1 = (Variable) visitExp_ig(ctx.exp_ig());
+    public T visitExp_ig(Exp_igContext ctx) {
+        Variable var1, var2 = (Variable) visitExp_rel(ctx.exp_rel()), var3;
+        if (ctx.exp_ig() != null) {
+            var1 = (Variable) visitExp_ig(ctx.exp_ig());
 
-			var3 = new Variable(Constants.INT, null);
-			String op = ctx.OP_IG().getText();
-			if (op.equals("ne") || op.equals("eq")) {
-				if (var1.getTipo() == Constants.STRING && var2.getTipo() == Constants.STRING) {
-					if (op.equals("eq")) {
-						var3.setValor((((String) var1.getValor()).equals((String) var2.getValor())) ? (Object) 1
-								: (Object) 0);
-					} else {
-						var3.setValor((((String) var1.getValor()).equals((String) var2.getValor())) ? (Object) 0
-								: (Object) 1);
-					}
-				} else {
-					String tipo;
-					if (var1.getTipo() != Constants.STRING) {
-						tipo = (var1.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_INT;
-					} else {
-						tipo = (var2.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_INT;
-					}
-					String msj = Error.incompatibleData(Error.ERR_STRING, tipo);
-					int line = (var1.getTipo() != Constants.STRING) ? ctx.exp_ig().getStart().getLine()
-							: ctx.exp_rel().getStart().getLine(),
-							col = (var1.getTipo() != Constants.STRING) ? ctx.exp_ig().getStart().getCharPositionInLine()
-									: ctx.exp_rel().getStart().getCharPositionInLine();
-					Error.printError(msj, line, col);
-				}
-			} else {
-				String msj = null;
-				if (var1.getTipo() == Constants.STRING || var2.getTipo() == Constants.STRING) {
-					msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
-				}
-				if (msj != null) {
-					int line = (var1.getTipo() == Constants.STRING) ? ctx.exp_ig().getStart().getLine()
-							: ctx.exp_rel().getStart().getLine(),
-							col = (var1.getTipo() == Constants.STRING) ? ctx.exp_ig().getStart().getCharPositionInLine()
-									: ctx.exp_rel().getStart().getCharPositionInLine();
-					Error.printError(msj, line, col);
-				}
-				if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
-					if (op.equals("==")) {
-						var3.setValor((((Double) var1.getValor()).equals((Double) var2.getValor())) ? (Object) 1
-								: (Object) 0);
-					} else {
-						var3.setValor((((Double) var1.getValor()).equals((Double) var2.getValor())) ? (Object) 0
-								: (Object) 1);
-					}
-				} else {
-					if (op.equals("==")) {
-						var3.setValor((((Integer) var1.getValor()).equals((Integer) var2.getValor())) ? (Object) 1
-								: (Object) 0);
-					} else {
-						var3.setValor((((Integer) var1.getValor()).equals((Integer) var2.getValor())) ? (Object) 0
-								: (Object) 1);
-					}
-				}
-			}
-			return (T) var3;
-		}
-		return (T) var2;
-	}
+            var3 = new Variable(Constants.INT, null);
+            String op = ctx.op_ig().getText();
+            if (op.equals("ne") || op.equals("eq")) {
+                if (var1.getTipo() == Constants.STRING && var2.getTipo() == Constants.STRING) {
+                    if (op.equals("eq")) {
+                        var3.setValor((((String) var1.getValor()).equals((String) var2.getValor())) ? (Object) 1
+                                : (Object) 0);
+                    } else {
+                        var3.setValor((((String) var1.getValor()).equals((String) var2.getValor())) ? (Object) 0
+                                : (Object) 1);
+                    }
+                } else {
+                    String tipo;
+                    int line, col;
+                    if (var1.getTipo() != Constants.STRING) {
+                        tipo = (var1.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_INT;
+                        line = ctx.exp_ig().getStart().getLine();
+                        col = ctx.exp_ig().getStart().getCharPositionInLine();
+                    } else {
+                        tipo = (var2.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_INT;
+                        line = ctx.exp_rel().getStart().getLine();
+                        col = ctx.exp_rel().getStart().getCharPositionInLine();
+                    }
+                    String msj = Error.incompatibleData(Error.ERR_STRING, tipo);
+                    Error.printError(msj, line, col + 1);
+                }
+            } else {
+                String msj = null;
+                if (var1.getTipo() == Constants.STRING || var2.getTipo() == Constants.STRING) {
+                    msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
+                    int line = (var1.getTipo() == Constants.STRING) ? ctx.exp_ig().getStart().getLine()
+                            : ctx.exp_rel().getStart().getLine(),
+                            col = (var1.getTipo() == Constants.STRING) ? ctx.exp_ig().getStart().getCharPositionInLine()
+                            : ctx.exp_rel().getStart().getCharPositionInLine();
+                    Error.printError(msj, line, col + 1);
+                }
+                if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
+                    if (op.equals("==")) {
+                        Double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
+                                v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
+                        var3.setValor(((v1).equals(v2)) ? (Object) 1 : (Object) 0);
+                    } else {
+                        Double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
+                                v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
+                        var3.setValor(((v1).equals(v2)) ? (Object) 0 : (Object) 1);
+                    }
+                } else {
+                    if (op.equals("==")) {
+                        var3.setValor((((Integer) var1.getValor()).equals((Integer) var2.getValor())) ? (Object) 1
+                                : (Object) 0);
+                    } else {
+                        var3.setValor((((Integer) var1.getValor()).equals((Integer) var2.getValor())) ? (Object) 0
+                                : (Object) 1);
+                    }
+                }
+            }
+            return (T) var3;
+        }
+        return (T) var2;
+    }
 
-	public T visitExp_rel(Exp_relContext ctx) {
-		Variable var1, var2 = (Variable) visitExp_add(ctx.exp_add()), var3;
-		if (ctx.exp_rel() != null) {
-			var1 = (Variable) visitExp_rel(ctx.exp_rel());
+    public T visitExp_rel(Exp_relContext ctx) {
+        Variable var1, var2 = (Variable) visitExp_add(ctx.exp_add()), var3;
+        if (ctx.exp_rel() != null) {
+            var1 = (Variable) visitExp_rel(ctx.exp_rel());
+            var3 = new Variable(Constants.INT, null);
+            String op = ctx.op_rel().getText();
 
-			var3 = new Variable(Constants.INT, null);
-			String op = ctx.OP_REL().getText();
-			if (op.equals(">=")) {
-				if (var1.getTipo() == Constants.STRING && var2.getTipo() == Constants.STRING) {
-					var3.setValor((0 > ((String) var1.getValor()).compareTo((String) var2.getValor())) ? (Object) 0
-							: (Object) 1);
-				} else if (var1.getTipo() == Constants.STRING)
-					;
-				else if (var2.getTipo() == Constants.STRING)
-					; // Error, String no se puede comparar con otro tipo de
-						// dato
-				else if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
-					var3.setValor(((Double) var1.getValor() >= (Double) var2.getValor()) ? (Object) 1 : (Object) 0);
-				} else {
-					var3.setValor(((Integer) var1.getValor() >= (Integer) var2.getValor()) ? (Object) 1 : (Object) 0);
-				}
-			} else if (op.equals("<=")) {
-				if (var1.getTipo() == Constants.STRING && var2.getTipo() == Constants.STRING) {
-					var3.setValor((0 < ((String) var1.getValor()).compareTo((String) var2.getValor())) ? (Object) 0
-							: (Object) 1);
-				} else if (var1.getTipo() == Constants.STRING)
-					;
-				else if (var2.getTipo() == Constants.STRING)
-					; // Error, String no se puede comparar con otro tipo de
-						// dato
-				else if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
-					var3.setValor(((Double) var1.getValor() <= (Double) var2.getValor()) ? (Object) 1 : (Object) 0);
-				} else {
-					var3.setValor(((Integer) var1.getValor() <= (Integer) var2.getValor()) ? (Object) 1 : (Object) 0);
-				}
-			} else if (op.equals("<")) {
-				if (var1.getTipo() == Constants.STRING && var2.getTipo() == Constants.STRING) {
-					var3.setValor((0 > ((String) var1.getValor()).compareTo((String) var2.getValor())) ? (Object) 1
-							: (Object) 0);
-				} else if (var1.getTipo() == Constants.STRING)
-					;
-				else if (var2.getTipo() == Constants.STRING)
-					; // Error, String no se puede comparar con otro tipo de
-						// dato
-				else if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
-					var3.setValor(((Double) var1.getValor() < (Double) var2.getValor()) ? (Object) 1 : (Object) 0);
-				} else {
-					var3.setValor(((Integer) var1.getValor() < (Integer) var2.getValor()) ? (Object) 1 : (Object) 0);
-				}
-			} else if (op.equals(">")) {
-				if (var1.getTipo() == Constants.STRING && var2.getTipo() == Constants.STRING) {
-					var3.setValor((0 < ((String) var1.getValor()).compareTo((String) var2.getValor())) ? (Object) 1
-							: (Object) 0);
-				} else if (var1.getTipo() == Constants.STRING)
-					;
-				else if (var2.getTipo() == Constants.STRING)
-					; // Error, String no se puede comparar con otro tipo de
-						// dato
-				else if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
-					var3.setValor(((Double) var1.getValor() > (Double) var2.getValor()) ? (Object) 1 : (Object) 0);
-				} else {
-					var3.setValor(((Integer) var1.getValor() > (Integer) var2.getValor()) ? (Object) 1 : (Object) 0);
-				}
-			}
-			return (T) var3;
-		}
-		return (T) var2;
-	}
+            if (var1.getTipo() == Constants.STRING && var2.getTipo() != Constants.STRING) {
+                String tipo = (var2.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_INT;
+                int line = ctx.exp_add().getStart().getLine(),
+                        col = ctx.exp_add().getStart().getCharPositionInLine();
 
-	public T visitExp_add(Exp_addContext ctx) {
-		Variable var1, var2 = (Variable) visitExp_mul(ctx.exp_mul()), var3;
-		if (ctx.exp_add() != null) {
-			var1 = (Variable) visitExp_add(ctx.exp_add());
-			;
+                String msj = Error.incompatibleData(Error.ERR_STRING, tipo);
+                Error.printError(msj, line, col + 1);
+            } else if (var2.getTipo() == Constants.STRING && var1.getTipo() != Constants.STRING) {
+                int line = ctx.exp_add().getStart().getLine(),
+                        col = ctx.exp_add().getStart().getCharPositionInLine();
 
-			String msj = null;
-			if (var1.getTipo() == Constants.STRING || var2.getTipo() == Constants.STRING) {
-				msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
-			}
-			if (msj != null) {
-				int line = (var1.getTipo() == Constants.STRING) ? ctx.exp_add().getStart().getLine()
-						: ctx.exp_mul().getStart().getLine(),
-						col = (var1.getTipo() == Constants.STRING) ? ctx.exp_add().getStart().getCharPositionInLine()
-								: ctx.exp_mul().getStart().getCharPositionInLine();
-				Error.printError(msj, line, col);
-			}
+                String msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
+                Error.printError(msj, line, col + 1);
+            }
+            if (op.equals(">=")) {
+                if (var1.getTipo() == Constants.STRING && var2.getTipo() == Constants.STRING) {
+                    var3.setValor((((String) var1.getValor()).compareTo((String) var2.getValor()) >= 0) ? (Object) 1
+                            : (Object) 0);
+                } else if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
+                    double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
+                            v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
+                    var3.setValor((v1 >= v2) ? (Object) 1 : (Object) 0);
+                } else {
+                    var3.setValor(((Integer) var1.getValor() >= (Integer) var2.getValor()) ? (Object) 1 : (Object) 0);
+                }
+            } else if (op.equals("<=")) {
+                if (var1.getTipo() == Constants.STRING && var2.getTipo() == Constants.STRING) {
+                    var3.setValor((((String) var1.getValor()).compareTo((String) var2.getValor()) <= 0) ? (Object) 1
+                            : (Object) 0);
+                } else if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
+                    double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
+                            v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
+                    var3.setValor((v1 <= v2) ? (Object) 1 : (Object) 0);
+                } else {
+                    var3.setValor(((Integer) var1.getValor() <= (Integer) var2.getValor()) ? (Object) 1 : (Object) 0);
+                }
+            } else if (op.equals("<")) {
+                if (var1.getTipo() == Constants.STRING && var2.getTipo() == Constants.STRING) {
+                    var3.setValor((((String) var1.getValor()).compareTo((String) var2.getValor()) < 0) ? (Object) 1
+                            : (Object) 0);
+                } else if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
+                    double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
+                            v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
+                    var3.setValor((v1 < v2) ? (Object) 1 : (Object) 0);
+                } else {
+                    var3.setValor(((Integer) var1.getValor() < (Integer) var2.getValor()) ? (Object) 1 : (Object) 0);
+                }
+            } else if (op.equals(">")) {
+                if (var1.getTipo() == Constants.STRING && var2.getTipo() == Constants.STRING) {
+                    var3.setValor((((String) var1.getValor()).compareTo((String) var2.getValor()) > 0) ? (Object) 1
+                            : (Object) 0);
+                } else if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
+                    double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
+                            v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
+                    var3.setValor((v1 > v2) ? (Object) 1 : (Object) 0);
+                } else {
+                    var3.setValor(((Integer) var1.getValor() > (Integer) var2.getValor()) ? (Object) 1 : (Object) 0);
+                }
+            }
+            return (T) var3;
+        }
+        return (T) var2;
+    }
 
-			var3 = new Variable(-1, null);
-			char op = ctx.OP_ADD().getText().charAt(0);
-			if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
-				double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
-						v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
-				if (op == '+') {
-					var3.setValor((Object) (v1 + v2));
-				} else {
-					var3.setValor((Object) (v1 - v2));
-				}
-				var3.setTipo(Constants.DOUBLE);
-			} else {
-				if (op == '+') {
-					var3.setValor((Object) ((Integer) var1.getValor() + (Integer) var2.getValor()));
-				} else {
-					var3.setValor((Object) ((Integer) var1.getValor() - (Integer) var2.getValor()));
-				}
-				var3.setTipo(Constants.INT);
-			}
-			return (T) var3;
-		}
-		return (T) var2;
-	}
+    public T visitExp_add(Exp_addContext ctx) {
+        Variable var1, var2 = (Variable) visitExp_mul(ctx.exp_mul()), var3;
+        if (ctx.exp_add() != null) {
+            var1 = (Variable) visitExp_add(ctx.exp_add());
+            ;
 
-	public T visitExp_mul(Exp_mulContext ctx) {
-		Variable var1, var2 = (Variable) visitExp_pot(ctx.exp_pot()), var3;
-		if (ctx.exp_mul() != null) {
-			var1 = (Variable) visitExp_mul(ctx.exp_mul());
+            String msj = null;
+            if (var1.getTipo() == Constants.STRING || var2.getTipo() == Constants.STRING) {
+                msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
+            }
+            if (msj != null) {
+                int line = (var1.getTipo() == Constants.STRING) ? ctx.exp_add().getStart().getLine()
+                        : ctx.exp_mul().getStart().getLine(),
+                        col = (var1.getTipo() == Constants.STRING) ? ctx.exp_add().getStart().getCharPositionInLine()
+                        : ctx.exp_mul().getStart().getCharPositionInLine();
+                Error.printError(msj, line, col + 1);
+            }
 
-			char op = ctx.OP_MUL().getText().charAt(0);
-			if (op == '%') {
-				String msj = null;
-				if (var1.getTipo() == Constants.STRING || var2.getTipo() == Constants.STRING) {
-					msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING);
-				} else if (var2.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
-					msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
-				}
-				if (msj != null) {
-					int line = (var1.getTipo() == Constants.DOUBLE || var1.getTipo() == Constants.STRING)
-							? ctx.exp_mul().getStart().getLine() : ctx.exp_pot().getStart().getLine(),
-							col = (var1.getTipo() == Constants.DOUBLE || var1.getTipo() == Constants.STRING)
-									? ctx.exp_mul().getStart().getCharPositionInLine()
-									: ctx.exp_pot().getStart().getCharPositionInLine();
-					Error.printError(msj, line, col);
-				}
+            var3 = new Variable(-1, null);
+            char op = ctx.op_add().getText().charAt(0);
+            if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
+                double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
+                        v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
+                if (op == '+') {
+                    var3.setValor((Object) (v1 + v2));
+                } else {
+                    var3.setValor((Object) (v1 - v2));
+                }
+                var3.setTipo(Constants.DOUBLE);
+            } else {
+                if (op == '+') {
+                    var3.setValor((Object) ((Integer) var1.getValor() + (Integer) var2.getValor()));
+                } else {
+                    var3.setValor((Object) ((Integer) var1.getValor() - (Integer) var2.getValor()));
+                }
+                var3.setTipo(Constants.INT);
+            }
+            return (T) var3;
+        }
+        return (T) var2;
+    }
 
-				var3 = new Variable(Constants.INT, (Object) ((int) var1.getValor() % (int) var2.getValor()));
-			} else {
-				String msj = null;
-				if (var1.getTipo() == Constants.STRING || var2.getTipo() == Constants.STRING) {
-					msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
-				}
-				if (msj != null) {
-					int line = (var1.getTipo() == Constants.STRING) ? ctx.exp_mul().getStart().getLine()
-							: ctx.exp_pot().getStart().getLine(),
-							col = (var1.getTipo() == Constants.STRING)
-									? ctx.exp_mul().getStart().getCharPositionInLine()
-									: ctx.exp_pot().getStart().getCharPositionInLine();
-					Error.printError(msj, line, col);
-				}
+    public T visitExp_mul(Exp_mulContext ctx) {
+        Variable var1, var2 = (Variable) visitExp_pot(ctx.exp_pot()), var3;
+        if (ctx.exp_mul() != null) {
+            var1 = (Variable) visitExp_mul(ctx.exp_mul());
+            char op = ctx.op_mul().getText().charAt(0);
+            if (op == '%') {
+                String msj = null;
+                if (var1.getTipo() == Constants.STRING) {
+                    msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING);
+                } else if (var1.getTipo() == Constants.DOUBLE) {
+                    msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
+                } else if (var2.getTipo() == Constants.STRING) {
+                    msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING);
+                } else if (var2.getTipo() == Constants.DOUBLE) {
+                    msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
+                }
+                if (msj != null) {
+                    int line = (var1.getTipo() == Constants.DOUBLE || var1.getTipo() == Constants.STRING)
+                            ? ctx.exp_mul().getStart().getLine() : ctx.exp_pot().getStart().getLine(),
+                            col = ((var1.getTipo() == Constants.DOUBLE || var1.getTipo() == Constants.STRING)
+                            ? ctx.exp_mul().getStart().getCharPositionInLine()
+                            : ctx.exp_pot().getStart().getCharPositionInLine());
+                    Error.printError(msj, line, col + 1);
+                }
 
-				var3 = new Variable(-1, null);
-				if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
-					double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor()
-							: (int) var1.getValor()),
-							v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor()
-									: (int) var2.getValor());
-					if (op == '*') {
-						var3.setValor((Object) (v1 * v2));
-					} else {
-						var3.setValor((Object) (v1 / v2));
-					}
-					var3.setTipo(Constants.DOUBLE);
-				} else {
-					if (op == '*') {
-						var3.setValor((Object) ((int) var1.getValor() * (int) var2.getValor()));
-					} else {
-						var3.setValor((Object) ((int) var1.getValor() / (int) var2.getValor()));
-					}
-					var3.setTipo(Constants.INT);
-				}
-			}
-			return (T) var3;
-		}
-		return (T) var2;
-	}
+                var3 = new Variable(Constants.INT, (Object) ((int) var1.getValor() % (int) var2.getValor()));
+            } else {
+                String msj = null;
+                if (var1.getTipo() == Constants.STRING || var2.getTipo() == Constants.STRING) {
+                    msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
+                }
+                if (msj != null) {
+                    int line = (var1.getTipo() == Constants.STRING) ? ctx.exp_mul().getStart().getLine()
+                            : ctx.exp_pot().getStart().getLine(),
+                            col = (var1.getTipo() == Constants.STRING)
+                            ? ctx.exp_mul().getStart().getCharPositionInLine()
+                            : ctx.exp_pot().getStart().getCharPositionInLine();
+                    Error.printError(msj, line, col + 1);
+                }
 
-	public T visitExp_pot(Exp_potContext ctx) {
-		Variable var1, var2 = (Variable) visitExp_una(ctx.exp_una()), var3;
-		if (ctx.exp_pot() != null) {
-			var1 = (Variable) visitExp_pot(ctx.exp_pot());
+                var3 = new Variable(-1, null);
+                if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
+                    double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor()
+                            : (int) var1.getValor()),
+                            v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor()
+                            : (int) var2.getValor());
+                    if (op == '*') {
+                        var3.setValor((Object) (v1 * v2));
+                    } else {
+                        var3.setValor((Object) (v1 / v2));
+                    }
+                    var3.setTipo(Constants.DOUBLE);
+                } else {
+                    if (op == '*') {
+                        var3.setValor((Object) ((int) var1.getValor() * (int) var2.getValor()));
+                    } else {
+                        var3.setValor((Object) ((int) var1.getValor() / (int) var2.getValor()));
+                    }
+                    var3.setTipo(Constants.INT);
+                }
+            }
+            return (T) var3;
+        }
+        return (T) var2;
+    }
 
-			String msj = null;
-			if (var1.getTipo() == Constants.STRING || var2.getTipo() == Constants.STRING) {
-				msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
-				int line = (var1.getTipo() == Constants.STRING) ? ctx.exp_pot().getStart().getLine()
-						: ctx.exp_una().getStart().getLine(),
-						col = (var1.getTipo() == Constants.STRING) ? ctx.exp_pot().getStart().getCharPositionInLine()
-								: ctx.exp_una().getStart().getCharPositionInLine();
-				Error.printError(msj, line, col);
-			}
+    public T visitExp_pot(Exp_potContext ctx) {
+        Variable var1, var2 = (Variable) visitExp_una(ctx.exp_una()), var3;
+        if (ctx.exp_pot() != null) {
+            var1 = (Variable) visitExp_pot(ctx.exp_pot());
 
-			var3 = new Variable(-1, null);
+            String msj = null;
+            if (var1.getTipo() == Constants.STRING || var2.getTipo() == Constants.STRING) {
+                msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
+                int line = (var1.getTipo() == Constants.STRING) ? ctx.exp_pot().getStart().getLine()
+                        : ctx.exp_una().getStart().getLine(),
+                        col = (var1.getTipo() == Constants.STRING) ? ctx.exp_pot().getStart().getCharPositionInLine()
+                        : ctx.exp_una().getStart().getCharPositionInLine();
+                Error.printError(msj, line, col + 1);
+            }
 
-			if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
-				double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
-						v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
-				var3.setValor((Object) Math.pow(v1, v2));
-				var3.setTipo(Constants.DOUBLE);
-			} else {
-				var3.setValor((Object) (int) Math.pow((int) var1.getValor(), (int) var2.getValor()));
-				var3.setTipo(Constants.INT);
-			}
-			return (T) var3;
-		}
-		return (T) var2;
+            var3 = new Variable(-1, null);
 
-	}
+            if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
+                double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
+                        v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
+                var3.setValor((Object) Math.pow(v1, v2));
+                var3.setTipo(Constants.DOUBLE);
+            } else {
+                var3.setValor((Object) (int) Math.pow((int) var1.getValor(), (int) var2.getValor()));
+                var3.setTipo(Constants.INT);
+            }
+            return (T) var3;
+        }
+        return (T) var2;
 
-	public T visitExp_una(Exp_unaContext ctx) {
-		if (ctx.OP_UNA() != null) {
-			char op = ctx.OP_UNA().getText().charAt(0);
-			Variable var = (Variable) visitExp_una(ctx.exp_una());
-			int line = ctx.exp_una().getStart().getLine(), col = ctx.exp_una().getStart().getCharPositionInLine();
-			if (op == '!') {
-				if (var.getTipo() != Constants.INT) {
-					String msj = (var.getTipo() == Constants.STRING)
-							? Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING)
-							: Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
-					Error.printError(msj, line, col);
-				}
-				var.setValor(((Integer) var.getValor() == 0) ? (Object) 1 : (Object) 0);
-			} else {
-				if (var.getTipo() == Constants.STRING) {
-					String msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
-					Error.printError(msj, line, col);
-				}
-				var.setValor((Object) ((Integer) var.getValor()));
-			}
-			return (T) var;
-		} else {
-			return visitTerm(ctx.term());
-		}
-	}
+    }
 
-	public T visitTerm(TermContext ctx) {
-		if (ctx.IDENTIFICADOR() != null) {
-			return visitIdentificador(ctx.IDENTIFICADOR(), ctx.indice());
-		} else if (ctx.agrup() != null) {
-			return visitAgrup(ctx.agrup());
-		} else if (ctx.valor() != null) {
-			return visitValor(ctx.valor());
-		} else if (ctx.exp_or() != null) {
-			return visitExp_or(ctx.exp_or());
-		}
-		return null;
-	}
+    public T visitExp_una(Exp_unaContext ctx) {
+        if (ctx.op_una() != null) {
+            char op = ctx.op_una().getText().charAt(0);
+            Variable var = (Variable) visitExp_una(ctx.exp_una());
+            int line = ctx.exp_una().getStart().getLine(), col = ctx.exp_una().getStart().getCharPositionInLine();
+            if (op == '!') {
+                if (var.getTipo() != Constants.INT) {
+                    String msj = (var.getTipo() == Constants.STRING)
+                            ? Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING)
+                            : Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
+                    Error.printError(msj, line, col + 1);
+                }
+                var.setValor(((Integer) var.getValor() == 0) ? (Object) 1 : (Object) 0);
+            } else {
+                if (var.getTipo() == Constants.STRING) {
+                    String msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
+                    Error.printError(msj, line, col + 1);
+                } else if (var.getTipo() == Constants.INT) {
+                    var.setValor((Object) (-(Integer) var.getValor()));
+                } else {
+                    var.setValor((Object) (-(Double) var.getValor()));
+                }
+            }
+            return (T) var;
+        } else {
+            return visitTerm(ctx.term());
+        }
+    }
 
-	private T visitIdentificador(TerminalNode id_ctx, IndiceContext idx_ctx) {
-		String nameVar = id_ctx.getText();
-		Variable indice = null;
-		if (idx_ctx != null) { // Se mira si existe un indice
-			indice = (Variable) visitIndice(idx_ctx);
-		}
+    public T visitTerm(TermContext ctx) {
+        if (ctx.IDENTIFICADOR() != null) {
+            return visitIdentificador(ctx.IDENTIFICADOR(), ctx.indice());
+        } else if (ctx.agrup() != null) {
+            return visitAgrup(ctx.agrup());
+        } else if (ctx.valor() != null) {
+            return visitValor(ctx.valor());
+        } else if (ctx.exp_or() != null) {
+            return visitExp_or(ctx.exp_or());
+        }
+        return null;
+    }
 
-		Object temp = valueID(nameVar);
-		if (temp == null) { // Si se cumple, la cariable no existe
-			String msj = Error.variableNotDeclared(nameVar);
-			int line = id_ctx.getSymbol().getLine();
-			int col = id_ctx.getSymbol().getCharPositionInLine();
-			Error.printError(msj, line, col);
-			return null;
-		} else {
-			if (indice != null) { // Si existe algun indice
+    private T visitIdentificador(TerminalNode id_ctx, IndiceContext idx_ctx) {
+        String nameVar = id_ctx.getText();
+        Variable indice = null;
+        if (idx_ctx != null) { // Se mira si existe un indice
+            indice = (Variable) visitIndice(idx_ctx);
+        }
 
-				// Es una variable y se esta pasando como arreglo -> ERROR
-				if (temp.getClass().getName().equals("business.Variable")) {
-					String msj = Error.variableNotArray(nameVar);
-					int line = id_ctx.getSymbol().getLine();
-					int col = id_ctx.getSymbol().getCharPositionInLine();
-					Error.printError(msj, line, col);
-					return null;
-				}
+        Object temp = valueID(nameVar);
+        if (temp == null) { // Si se cumple, la cariable no existe
+            String msj = Error.variableNotDeclared(nameVar);
+            int line = id_ctx.getSymbol().getLine();
+            int col = id_ctx.getSymbol().getCharPositionInLine();
+            Error.printError(msj, line, col);
+            return null;
+        } else {
+            if (indice != null) { // Si existe algun indice
 
-				Arreglo arr = (Arreglo) temp;
-				// Se mira si el indice existe, si no, es un error
-				if (arr.containsKey(indice.getValor())) {
-					return (T) arr.getValue(indice.getValor());
-				} else {
-					String msj = Error.arrayWithoutKey(nameVar, indice.valorToString());
-					int line = id_ctx.getSymbol().getLine();
-					int col = id_ctx.getSymbol().getCharPositionInLine();
-					Error.printError(msj, line, col);
-					return null;
-				}
-			} else {
-				// Si se esta llamando a una variable pero es un arreglo ->
-				// ERROR
-				if (temp.getClass().getName().equals("business.Arreglo")) {
-					String msj = Error.variableIsArray(nameVar);
-					int line = id_ctx.getSymbol().getLine();
-					int col = id_ctx.getSymbol().getCharPositionInLine();
-					Error.printError(msj, line, col);
-					return null;
-				} else {
-					return (T) (Variable) temp;
-				}
-			}
-		}
-	}
+                // Es una variable y se esta pasando como arreglo -> ERROR
+                if (temp.getClass().getName().equals("business.Variable")) {
+                    String msj = Error.variableNotArray(nameVar);
+                    int line = id_ctx.getSymbol().getLine();
+                    int col = id_ctx.getSymbol().getCharPositionInLine();
+                    Error.printError(msj, line, col);
+                    return null;
+                }
 
-	String getTipo(int tipo) {
-		switch (tipo) {
-		case Constants.INT:
-			return "INTEGER";
-		case Constants.DOUBLE:
-			return "DOUBLE";
-		case Constants.STRING:
-			return "STRING";
-		default:
-			return "Seras mamon";
-		}
-	}
+                Arreglo arr = (Arreglo) temp;
+                // Se mira si el indice existe, si no, es un error
+                if (arr.containsKey(indice.getValor())) {
+                    return (T) arr.getValue(indice.getValor());
+                } else {
+                    String msj = Error.arrayWithoutKey(nameVar, indice.valorToString());
+                    int line = id_ctx.getSymbol().getLine();
+                    int col = id_ctx.getSymbol().getCharPositionInLine();
+                    Error.printError(msj, line, col);
+                    return null;
+                }
+            } else {
+                // Si se esta llamando a una variable pero es un arreglo ->
+                // ERROR
+                if (temp.getClass().getName().equals("business.Arreglo")) {
+                    String msj = Error.variableIsArray(nameVar);
+                    int line = id_ctx.getSymbol().getLine();
+                    int col = id_ctx.getSymbol().getCharPositionInLine();
+                    Error.printError(msj, line, col);
+                    return null;
+                } else {
+                    return (T) (Variable) temp;
+                }
+            }
+        }
+    }
 
-	/*
+    String getTipo(int tipo) {
+        switch (tipo) {
+            case Constants.INT:
+                return "INTEGER";
+            case Constants.DOUBLE:
+                return "DOUBLE";
+            case Constants.STRING:
+                return "STRING";
+            default:
+                return "Seras mamon";
+        }
+    }
+
+    /*
 	 * Funcion se encarga de mirar si la variable existe en alguna de las tablas
 	 * Si no existe retorna null y si existe retorna la Variable que corresponda
-	 */
-
-	public T valueID(String id) {
-		List<Map<String, Object>> ts = tables;
-		if (funcActual != null) {
-			ts = funcActual.getTables();
-		}
-		for (Map<String, Object> table : ts) {
-			if (table.containsKey(id)) {
-				return (T) table.get(id);
-			}
-		}
-		return null;
-	}
+     */
+    public T valueID(String id) {
+        List<Map<String, Object>> ts = tables;
+        if (funcActual != null) {
+            ts = funcActual.getTables();
+        }
+        for (Map<String, Object> table : ts) {
+            if (table.containsKey(id)) {
+                return (T) table.get(id);
+            }
+        }
+        return null;
+    }
 
 }
+
+    /*//////////////////////////////////////////////////////////////////////////
+                            ___   ___    __     ___
+                           | _,\ | _ \  /__\   / _/
+                           | v_/ | v / | \/ | | \__
+                           |_|   |_|_\  \__/   \__/
+    
+     /////////////////////////////////////////////////////////////////////////*/

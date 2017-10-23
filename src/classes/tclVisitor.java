@@ -484,4 +484,34 @@ public interface tclVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitTerm(tclParser.TermContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link tclParser#op_ig}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOp_ig(tclParser.Op_igContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link tclParser#op_rel}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOp_rel(tclParser.Op_relContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link tclParser#op_add}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOp_add(tclParser.Op_addContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link tclParser#op_mul}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOp_mul(tclParser.Op_mulContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link tclParser#op_una}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOp_una(tclParser.Op_unaContext ctx);
 }

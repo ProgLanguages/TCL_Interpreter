@@ -110,20 +110,20 @@ inicio_while	:	'while' '{' expresion '}' '{'  ;
 expresion	:	exp_or  ;
 exp_or	:	exp_or '||' exp_and | exp_and  ;
 exp_and	:	exp_and '&&' exp_ig | exp_ig  ;
-exp_ig	:	exp_ig OP_IG exp_rel | exp_rel  ;
-exp_rel	:	exp_rel OP_REL exp_add | exp_add  ;
-exp_add	:	exp_add OP_ADD exp_mul | exp_mul  ;
-exp_mul	:	exp_mul OP_MUL exp_pot | exp_pot  ;
+exp_ig	:	exp_ig op_ig exp_rel | exp_rel  ;
+exp_rel	:	exp_rel op_rel exp_add | exp_add  ;
+exp_add	:	exp_add op_add exp_mul | exp_mul  ;
+exp_mul	:	exp_mul op_mul exp_pot | exp_pot  ;
 exp_pot	:	exp_pot '**' exp_una | exp_una  ;
-exp_una	:	OP_UNA exp_una | term  ;
+exp_una	:	op_una exp_una | term  ;
 term	:	'$' IDENTIFICADOR indice | agrup | valor | '(' exp_or ')'  ;
 
 
-OP_IG	:	'eq' | '==' | 'ne' | '!='  ;
-OP_REL	:	'>' | '<' | '>=' | '<='  ;
-OP_ADD	:	'+' | '-'  ;
-OP_MUL	:	'*' | '/' | '%'  ;
-OP_UNA	:	'!' | '-'  ;
+op_ig	:	'eq' | '==' | 'ne' | '!='  ;
+op_rel	:	'>' | '<' | '>=' | '<='  ;
+op_add	:	'+' | '-'  ;
+op_mul	:	'*' | '/' | '%'  ;
+op_una	:	'-' | '!'  ;
 
 
 IDENTIFICADOR	:	[a-zA-Z_][a-zA-Z0-9_]*  ;
