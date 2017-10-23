@@ -233,6 +233,120 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 			return visitChildren(ctx);
 		}
 	}
+
+    @Override
+    public T visitWhile_funcion(tclParser.While_funcionContext ctx) {
+        funcActual.setTable();
+        Variable expresion = (Variable) visitInicio_while(ctx.inicio_while());
+        while((int)expresion.getValor() != 0){
+            hasToBreak = false;
+            hasToContinue = false;
+            visitCuerpo_loop_func(ctx.cuerpo_loop_func());
+            if (hasToBreak){
+                hasToBreak = false;
+                break;
+            }
+            if (returnValue != null) {
+                break;
+            }
+            if (hasToContinue){
+                hasToContinue = false;
+            }
+            expresion = (Variable) visitInicio_while(ctx.inicio_while());
+        }
+        funcActual.removeTable();
+        return null;
+    }
+
+    @Override
+    public T visitFor_funcion(tclParser.For_funcionContext ctx) {
+        funcActual.setTable();
+        visitDec_for(ctx.inicio_for().dec_for());
+        Variable expresion = (Variable) visitExpresion(ctx.inicio_for().expresion());
+        if(expresion.getTipo() != Constants.INT){
+            String msj = Error.incompatibleData(Error.ERR_INT, expresion.getTipo());
+            Error.printError(msj, getLocation(ctx.inicio_for().expresion()));
+        }
+        Variable varToIncr = (Variable) visitIdentificador(ctx.inicio_for().IDENTIFICADOR(), null);
+        Variable incr = (Variable) visitIncremento(ctx.inicio_for().incremento());
+        while((int)expresion.getValor() != 0){
+            hasToBreak = false;
+            hasToContinue = false;
+            visitCuerpo_loop_func(ctx.cuerpo_loop_func());
+            if(hasToBreak){
+                hasToBreak = false;
+                break;
+            }
+            if(returnValue != null){
+                break;
+            }
+            if(hasToContinue)
+                hasToBreak = false;
+            int newVal = (int)varToIncr.getValor() + (int)incr.getValor();
+            varToIncr.setValor(newVal);
+            expresion = (Variable) visitExpresion(ctx.inicio_for().expresion());
+            if(expresion.getTipo() != Constants.INT){
+                String msj = Error.incompatibleData(Error.ERR_INT, expresion.getTipo());
+                Error.printError(msj, getLocation(ctx.inicio_for().expresion()));
+            }
+        }
+        funcActual.removeTable();
+        return null;
+    }
+
+    @Override
+    public T visitSwitch_loop_func(tclParser.Switch_loop_funcContext ctx) {
+        Variable var = (Variable) visitInicio_switch(ctx.inicio_switch());        
+        String nameVar = "-switch";
+        funcActual.setVariable(nameVar, var);
+        visitCase_loop_func(ctx.case_loop_func());
+        funcActual.removeVariable(nameVar);
+        return null;
+    }
+
+    @Override
+    public T visitCase_loop_func(tclParser.Case_loop_funcContext ctx) {
+        int valor = (int)((Variable)visitInicio_case(ctx.inicio_case())).getValor();
+        Variable temp = (Variable) funcActual.getVarSwitch();
+        if(valor == (int)temp.getValor()){
+            funcActual.setTable();
+            visitCuerpo_loop_func(ctx.cuerpo_loop_func());
+            funcActual.removeTable();
+        } else {
+            if(ctx.case2_loop_func()!= null){
+                return visitCase2_loop_func(ctx.case2_loop_func());				
+            } 
+        }		
+        return null;
+    }
+
+    @Override
+    public T visitCase2_loop_func(tclParser.Case2_loop_funcContext ctx) {
+        if (ctx.default_loop_func() != null){
+            return visitDefault_loop_func(ctx.default_loop_func());
+        }
+        int valor = (int) ((Variable)visitInicio_case(ctx.inicio_case())).getValor();
+        Variable temp = (Variable) funcActual.getVarSwitch();
+        if(valor == (int) temp.getValor()){            
+            funcActual.setTable();
+            visitCuerpo_loop_func(ctx.cuerpo_loop_func());
+            funcActual.removeTable();
+        } else {
+            if(ctx.case2_loop_func()!= null){
+                return visitCase2_loop_func(ctx.case2_loop_func());
+            }
+        }
+        return null;
+    }
+        
+    @Override
+    public T visitDefault_loop_func(tclParser.Default_loop_funcContext ctx) {
+        funcActual.setTable();
+        visitCuerpo_loop_func(ctx.cuerpo_loop_func());
+        funcActual.removeTable();
+        return null;
+    }
+        
 	
 	@Override
 	public T visitR_return(R_returnContext ctx) {
@@ -356,24 +470,24 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 	}
 
     /*//////////////////////////////////////////////////////////////////////////
-		 ___    __    ___ 
-		| __|  /__\  | _ \
-		| _|  | \/ | | v /
-		|_|    \__/  |_|_\
+                            ___    __    ___ 
+                           | __|  /__\  | _ \
+                           | _|  | \/ | | v /
+                           |_|    \__/  |_|_\
         
     /////////////////////////////////////////////////////////////////////////*/	
 		
 	@Override
 	public T visitR_for(R_forContext ctx) {
-		tables.add(new HashMap<>());		
-		visitDec_for(ctx.inicio_for().dec_for());		
-		Variable expresion = (Variable) visitExpresion(ctx.inicio_for().expresion());		
+		tables.add(new HashMap<>());
+		visitDec_for(ctx.inicio_for().dec_for());
+		Variable expresion = (Variable) visitExpresion(ctx.inicio_for().expresion());
                 if(expresion.getTipo() != Constants.INT){
 			String msj = Error.incompatibleData(Error.ERR_INT, expresion.getTipo());
 			Error.printError(msj, getLocation(ctx.inicio_for().expresion()));
 		}
 		Variable varToIncr = (Variable) visitIdentificador(ctx.inicio_for().IDENTIFICADOR(), null);
-		Variable incr = (Variable) visitIncremento(ctx.inicio_for().incremento());		
+		Variable incr = (Variable) visitIncremento(ctx.inicio_for().incremento());
 		while((int)expresion.getValor() != 0){
 			hasToBreak = false;
 			hasToContinue = false;

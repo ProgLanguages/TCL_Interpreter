@@ -13,7 +13,6 @@ public class Subrutina {
 	Cuerpo_funcionContext bloqueInstruccion;
 	List<Map<String, Object>> tableVars;
 	
-	
 	public Subrutina(Cuerpo_funcionContext dec, List<String> parametros){
 		this.argumentos = parametros;
 		this.bloqueInstruccion = dec;
