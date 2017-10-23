@@ -1,11 +1,16 @@
 proc sum {}{
 }
 
-
 for {set i 0} {$i < 5} {incr i}{
 	puts "Iterar $i";
 	set a 20;
 	for {set a 1} {$a < 5} {incr a}{
 		puts $a;
 	}
+}
+
+set papu 0;
+while {$papu < 10}{
+	puts "Iterar $papu";
+	set papu [expr {$papu+1}];
 }

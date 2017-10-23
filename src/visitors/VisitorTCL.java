@@ -54,6 +54,7 @@ import classes.tclParser.R_switchContext;
 import classes.tclParser.Switch_funcionContext;
 import classes.tclParser.TermContext;
 import classes.tclParser.ValorContext;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 public class VisitorTCL<T> extends tclBaseVisitor<T> {
 
@@ -73,17 +74,13 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
             // Si ya existia una funcion con el mismo nombre
             if (tableFunctions.containsKey(nameId)) {
                 String msj = Error.repeatedFunction(nameId);
-                int line = ctx.IDENTIFICADOR().getSymbol().getLine();
-                int col = ctx.IDENTIFICADOR().getSymbol().getCharPositionInLine() + 1;
-                Error.printError(msj, line, col);
+                Error.printError(msj, location(ctx.IDENTIFICADOR()));
                 return null;
             } else {
                 tableFunctions.put(nameId, new Subrutina(ctx.cuerpo_funcion()));
-
                 /*
 				 * Hay que obetener los argumentos, y ponerle esos argumentos a
 				 * la funcion
-<<<<<<< HEAD
 				 */
 			}
 		}
@@ -146,12 +143,12 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 	}
 	
     /*//////////////////////////////////////////////////////////////////////////
-    _   ___ 
-   | | | __|
-   | | | _| 
-   |_| |_|  
+                                    _   ___ 
+                                   | | | __|
+                                   | | | _| 
+                                   |_| |_|  
 
-/////////////////////////////////////////////////////////////////////////*/
+    /////////////////////////////////////////////////////////////////////////*/
 	
 	@Override
 	public T visitR_if(R_ifContext ctx) {
@@ -194,12 +191,12 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 	}
 	
     /*//////////////////////////////////////////////////////////////////////////
-    __   _   _   _   _____    ___  _  _ 
-  /' _/ | | | | | | |_   _|  / _/ | || |
-  `._`. | 'V' | | |   | |   | \__ | >< |
-  |___/ !_/ \_! |_|   |_|    \__/ |_||_|
+                    __   _   _   _   _____    ___  _  _ 
+                  /' _/ | | | | | | |_   _|  / _/ | || |
+                  `._`. | 'V' | | |   | |   | \__ | >< |
+                  |___/ !_/ \_! |_|   |_|    \__/ |_||_|
 
-/////////////////////////////////////////////////////////////////////////*/	
+    /////////////////////////////////////////////////////////////////////////*/	
 	
 	@Override
 	public T visitR_switch(R_switchContext ctx) {
@@ -256,12 +253,14 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 		tables.remove(tables.size()-1);		
 		return null;
 	}
-	/*
+
+    /*//////////////////////////////////////////////////////////////////////////
 		 ___    __    ___ 
 		| __|  /__\  | _ \
 		| _|  | \/ | | v /
 		|_|    \__/  |_|_\
-	 */
+        
+    /////////////////////////////////////////////////////////////////////////*/	
 		
 	@Override
 	public T visitR_for(R_forContext ctx) {
@@ -272,34 +271,17 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 		Variable varToIncr = (Variable)visitIdentificador(ctx.inicio_for().IDENTIFICADOR(), null);
 		Variable incr = (Variable) visitIncremento(ctx.inicio_for().incremento());		
 		Variable expresion = (Variable) visitExpresion(ctx.inicio_for().expresion());
-		
-		
+				
 		if(iter.getTipo() != Constants.INT){
-			String msj = "";
-			if(iter.getTipo() == Constants.DOUBLE){
-				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
-			} else {
-				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING);
-			}
-			int line = ctx.inicio_for().dec_for().asig_for().getStart().getLine();
-			int col = ctx.inicio_for().dec_for().asig_for().getStart().getCharPositionInLine()+1;
-			Error.printError(msj, line, col);
+			String msj = Error.incompatibleData(Error.ERR_INT, (iter.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_STRING);
+			Error.printError(msj, location(ctx.inicio_for().dec_for().asig_for()));
 		} else if(expresion.getTipo() != Constants.INT){
-			String msj = "";
-			if(iter.getTipo() == Constants.DOUBLE){
-				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
-			} else {
-				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING);
-			}
-			int line = ctx.inicio_for().expresion().getStart().getLine();
-			int col = ctx.inicio_for().expresion().getStart().getCharPositionInLine()+1;
-			Error.printError(msj, line, col);
+			String msj = Error.incompatibleData(Error.ERR_INT, (iter.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_STRING);
+			Error.printError(msj, location(ctx.inicio_for().expresion()));
 		} else if(varToIncr == null){
 			String msj = Error.variableNotDeclared(nameIncr);
-			int line = ctx.inicio_for().IDENTIFICADOR().getSymbol().getLine();
-			int col = ctx.inicio_for().IDENTIFICADOR().getSymbol().getCharPositionInLine()+1;
-			Error.printError(msj, line, col);			
-		}else {			
+			Error.printError(msj, location(ctx.inicio_for().IDENTIFICADOR()));
+		} else {			
 			while((int)expresion.getValor() != 0){
 				visitCuerpo_loop(ctx.cuerpo_loop());				
 				int newVal = (int)varToIncr.getValor() + (int)incr.getValor();
@@ -328,7 +310,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 		Variable temp = (Variable)valueID(nameVar);
 		Variable newValue = (Variable) visitAsig_for(ctx.asig_for());
 		Map<String, Object> tempTable;
-		if (temp == null) { // Si se cumple la variable no existía
+		if (temp == null) { // Si se cumple la variable no existï¿½a
 			tempTable = tables.get(tables.size() - 1);
 			tempTable.put(nameVar, newValue);
 		} else {			
@@ -363,15 +345,8 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 		
 		// se hace un error de tipo, siempre debe ser INT
 		if (result.getTipo() != Constants.INT) { 
-			String msj = "";
-			if (result.getTipo() == Constants.DOUBLE) {
-				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
-			} else {
-				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING);
-			}
-			int line = ctx.IDENTIFICADOR().getSymbol().getLine();
-			int col = ctx.IDENTIFICADOR().getSymbol().getCharPositionInLine();
-			Error.printError(msj, line, col);
+			String msj = Error.incompatibleData(Error.ERR_INT, (result.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_STRING);
+			Error.printError(msj, location(ctx.IDENTIFICADOR()));
 			return null;
 		} else {
 			return (T) result;
@@ -381,26 +356,13 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 	@Override
 	public T visitInicio_if(Inicio_ifContext ctx) {
 		Variable result = (Variable) visitExpresion(ctx.expresion());
-
 		if (result.getTipo() != Constants.INT) {
-			String msj = "";
-			if (result.getTipo() == Constants.DOUBLE) {
-				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
-			} else if (result.getTipo() == Constants.STRING) {
-				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING);
-			}
-			int line = ctx.expresion().getStart().getLine();
-			int col = ctx.expresion().getStart().getCharPositionInLine() + 1;
-			Error.printError(msj, line, col);
+			String msj = Error.incompatibleData(Error.ERR_INT, (result.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_STRING);
+			Error.printError(msj, location(ctx.expresion()));
 			return null;
-		} else {
-			int res = (int) result.getValor();
-			if (res != 0) {
-				return (T) new Variable(Constants.INT, 1);
-			} else {
-				return (T) new Variable(Constants.INT, 0);
-			}
 		}
+                int res = (int) result.getValor();
+                return (T) new Variable(Constants.INT, (res != 0) ? 1 : 0);
 	}
 
 	@Override
@@ -408,23 +370,12 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 		Variable result = (Variable) visitExpresion(ctx.expresion());
 
 		if (result.getTipo() != Constants.INT) {
-			String msj = "";
-			if (result.getTipo() == Constants.DOUBLE) {
-				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
-			} else if (result.getTipo() == Constants.STRING) {
-				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING);
-			}
-			int line = ctx.expresion().getStart().getLine();
-			int col = ctx.expresion().getStart().getCharPositionInLine() + 1;
-			Error.printError(msj, line, col);
+			String msj = Error.incompatibleData(Error.ERR_INT, (result.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_STRING);
+			Error.printError(msj, location(ctx.expresion()));
 			return null;
 		} else {
 			int res = (int) result.getValor();
-			if (res != 0) {
-				return (T) new Variable(Constants.INT, 1);
-			} else {
-				return (T) new Variable(Constants.INT, 0);
-			}
+                        return (T) new Variable(Constants.INT, (res != 0) ? 1 : 0);
 		}
 	}
 
@@ -436,54 +387,43 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 		if (ctx.indice().val_indice() != null) { // Verifica que haya un indice
 			indice = (Variable) visitIndice(ctx.indice());
 		}
-
 		Object temp = valueID(nameVar);
 		Variable newValue = (Variable) visitAsignacion(ctx.asignacion());
 		Map<String, Object> tempTable;
-		if (temp == null) { // Si se cumple la variable no existía
-			if (indice != null) { // si se cumple se esta creando un nuevo
-									// arreglo
-				tempTable = tables.get(tables.size() - 1);
+		if (temp == null) {                             // Si se cumple la variable no existia
+			if (indice != null) {                   // si se cumple se esta creando un nuevo arreglo
+                                tempTable = tables.get(tables.size() - 1);
 				Arreglo newArreglo = new Arreglo();
 				newArreglo.insertIndice(indice.getValor(), newValue);
 				tempTable.put(nameVar, newArreglo);
-			} else { // si no se esta creando una nueva variable
+			} else {                                // si no se esta creando una nueva variable
 				tempTable = tables.get(tables.size() - 1);
 				tempTable.put(nameVar, newValue);
 			}
 		} else {
-			if (indice != null) { // si se cumple se puede actualizar o un nuevo
-									// indice
-				// si se estan intentando acceder a una que no es arreglo ->
-				// ERROR
+			if (indice != null) { // si se cumple se puede actualizar o un nuevo indice
+				// si se estan intentando acceder a una que no es arreglo -> ERROR
 				if (temp.getClass().getName().equals("business.Variable")) {
 					String msj = Error.variableNotArray(nameVar);
-					int line = ctx.IDENTIFICADOR().getSymbol().getLine();
-					int col = ctx.IDENTIFICADOR().getSymbol().getCharPositionInLine();
-					Error.printError(msj, line, col);
+                                        Error.printError(msj, location(ctx.IDENTIFICADOR()));
 					return null;
 				}
-
 				Arreglo arr = (Arreglo) temp;
-				if (arr.containsKey(indice.getValor())) { // se actualiza valor
-															// de indice
+				if (arr.containsKey(indice.getValor())) { // se actualiza valor de indice
 					arr.updateIndex(indice.getValor(), newValue);
 				} else { // si no se crea un nuevo indice
 					arr.insertIndice(indice.getValor(), newValue);
 				}
-			} else {
-				// se cambia a variable si la que existia era arreglo
+			} else {            // se cambia a variable si la que existia era arreglo
 				if (temp.getClass().getName().equals("business.Arreglo")) {
 					tempTable = tables.get(tables.size() - 1);
 					tempTable.remove(nameVar);
 					tempTable.put(nameVar, newValue);
-				} else { // se actualiza el valor de la variable
-					Variable cur = (Variable) temp;
-					cur.setValor(newValue.getValor());
-				}
+				}           // se actualiza el valor de la variable
+                                Variable cur = (Variable) temp;
+                                cur.setValor(newValue.getValor());
 			}
 		}
-
 		return null;
 	}
 
@@ -496,25 +436,19 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 	}
 
 	public T visitAsignacion(AsignacionContext ctx) {
-		if (ctx.valor() != null) { // Es un valor string, double o int
+		if (ctx.valor() != null) {                  // Es un valor string, double o int
 			return visitValor(ctx.valor());
-		} else if (ctx.agrup() != null) { // Es una agrupacion por cor.
-											// cuadrados
+		} else if (ctx.agrup() != null) {           // Es una agrupacion por []
 			return visitAgrup(ctx.agrup());
-		} else { // Si no es un identificador
-			return visitIdentificador(ctx.IDENTIFICADOR(), ctx.indice());
-		}
+		}                                           // Si no es un identificador
+                return visitIdentificador(ctx.IDENTIFICADOR(), ctx.indice());
 	}
 
 	public T visitIndice(IndiceContext ctx) {
-		if (ctx.val_indice() != null) { // Si se tiene un valor entre los
-										// parentesis
-			if (ctx.val_indice().valor() != null) { // Si es de tipo valor el
-													// indice
-				return (T) visitValor(ctx.val_indice().valor());
-			} else { // Si no, es de tipo agrupacion
-				return (T) visitAgrup(ctx.val_indice().agrup());
-			}
+		if (ctx.val_indice() != null) {                             // Si se tiene un valor entre los parentesis
+			if (ctx.val_indice().valor() != null)               // Si es de tipo valor el indice
+				return (T) visitValor(ctx.val_indice().valor());			                                        
+                        return (T) visitAgrup(ctx.val_indice().agrup());    // Si no, es de tipo agrupacion
 		}
 		return null;
 	}
@@ -522,75 +456,54 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 	public T visitParam_func(Param_funcContext ctx) {
 		List<Variable> params = new ArrayList<>();
 		if (ctx.aux_param() != null) {
-			if (ctx.aux_param().asignacion() != null) {
+			if (ctx.aux_param().asignacion() != null)
 				params.add((Variable) visitAsignacion(ctx.aux_param().asignacion()));
-			} else if (ctx.aux_param().expr() != null) {
+			else if (ctx.aux_param().expr() != null)
 				params.add((Variable) visitExpresion(ctx.aux_param().expr().expresion()));
-
-			}
 			params.addAll((List<Variable>) visitParam_func(ctx.aux_param().param_func()));
-
-		}
+                }
 		return (T) params;
 	}
 
 	public T visitAgrup(AgrupContext ctx) {
-		if (ctx.aux_agrup().expr() != null) { // Si dentro de la agrupacion es
-												// expr
+		if (ctx.aux_agrup().expr() != null) {                   // Si dentro de la agrupacion es expr
 			return (T) visitExpresion(ctx.aux_agrup().expr().expresion());
-		} else if (ctx.aux_agrup().param_func() != null) { // si dentro de agrup
-															// hay llamado a
-															// funcion
+		} else if (ctx.aux_agrup().param_func() != null) {      // si dentro de agrup hay llamado a funcion
 			String nameFunc = ctx.aux_agrup().IDENTIFICADOR().getText();
-
 			List<Variable> params = (List<Variable>) visitParam_func(ctx.aux_agrup().param_func());
-    
 			/*
 			 * En esta parte hay que verificar primero que el numero de
 			 * parametros sea correcto Luego hay que pasar a ejecutar la funcion
 			 * y retornar ese valor devuelto
-             */
-            return (T) new Variable(Constants.INT, 0);
-        } else if (ctx.aux_agrup().aux_array() != null) { // Si hay dentro una
-            // accion de array
-            String command = ctx.aux_agrup().aux_array().getStart().getText();
-            String nameId = ctx.aux_agrup().aux_array().IDENTIFICADOR().getText();
-            Object temp = valueID(nameId);
-
-            if (command.equals("size")) { // Realiza la accion de 'size'
-                if (temp == null) { // Si la variable no existe -> ERROR
-                    String msj = Error.variableNotDeclared(nameId);
-                    int line = ctx.aux_agrup().aux_array().IDENTIFICADOR().getSymbol().getLine();
-                    int col = ctx.aux_agrup().aux_array().IDENTIFICADOR().getSymbol().getCharPositionInLine() + 1;
-                    Error.printError(msj, line, col);
-                    return null;
+                         */
+                        return (T) new Variable(Constants.INT, 0);
+                } else if (ctx.aux_agrup().aux_array() != null) { // Si hay dentro una accion de array
+                    String command = ctx.aux_agrup().aux_array().getStart().getText();
+                    String nameId = ctx.aux_agrup().aux_array().IDENTIFICADOR().getText();
+                    Object temp = valueID(nameId);
+                    if (command.equals("size")) { // Realiza la accion de 'size'
+                        if (temp == null) { // Si la variable no existe -> ERROR
+                            String msj = Error.variableNotDeclared(nameId);
+                            Error.printError(msj, location(ctx.aux_agrup().aux_array().IDENTIFICADOR()));
+                            return null;
+                        }
+                        // Si variable no es un arreglo -> ERROR
+                        if (!temp.getClass().getName().equals("business.Arreglo")) {
+                            String msj = Error.variableNotArray(nameId);
+                            Error.printError(msj, location(ctx.aux_agrup().aux_array().IDENTIFICADOR()));
+                            return null;
+                        }
+                        Arreglo arr = (Arreglo) temp;
+                        return (T) new Variable(Constants.INT, arr.getSize());
+                    } else {                // AcciÃ³n de 'exists'
+                                            // variable existe y es un arreglo
+                         return (T) new Variable(Constants.INT, (temp != null && temp.getClass().getName().equals("business.Arreglo")) ? 1 : 0);
+                    }
+                } else if (ctx.aux_agrup().gets() != null) { // Se va a gets
+                    return visitGets(ctx.aux_agrup().gets());
                 }
-
-                // Si variable no es un arreglo -> ERROR
-                if (!temp.getClass().getName().equals("business.Arreglo")) {
-                    String msj = Error.variableNotArray(nameId);
-                    int line = ctx.aux_agrup().aux_array().IDENTIFICADOR().getSymbol().getLine();
-                    int col = ctx.aux_agrup().aux_array().IDENTIFICADOR().getSymbol().getCharPositionInLine() + 1;
-                    Error.printError(msj, line, col);
-                    return null;
-                } else {
-                    Arreglo arr = (Arreglo) temp;
-                    return (T) new Variable(Constants.INT, arr.getSize());
-                }
-            } else { // es la accion de 'exists'
-                // variable existe y es un arreglo
-                if (temp != null && temp.getClass().getName().equals("business.Arreglo")) {
-                    return (T) new Variable(Constants.INT, 1);
-                } else {
-                    return (T) new Variable(Constants.INT, 0);
-                }
-            }
-
-        } else if (ctx.aux_agrup().gets() != null) { // Se va a gets
-            return visitGets(ctx.aux_agrup().gets());
+                return null;
         }
-        return null;
-    }
 
     public T visitValor(ValorContext ctx) {
         if (ctx.VALOR_DOUBLE() != null) { // Mira si es un double
@@ -598,12 +511,9 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
         } else if (ctx.VALOR_ENTERO() != null) { // Mira si es un Entero
             return (T) new Variable(Constants.INT, Integer.parseInt(ctx.VALOR_ENTERO().getText()));
         }
-
-        // Hace la parte del String - Hay que mejorar, funciona regular
         String temp = ctx.VALOR_STRING().getText();
         String[] words = temp.substring(1, temp.length() - 1).split(" ");
         StringBuilder result = new StringBuilder("");
-        temp = "";
         Object res;
         int colTemp = 0;
         for (String word : words) {
@@ -611,20 +521,20 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
                 temp = word.substring(1);
                 res = valueID(temp);
                 if (res != null) {
-                    Variable val = (Variable) res;
-                    result.append(val.getValor().toString() + " ");
+                    result.append(((Variable)res).getValor().toString() + " ");
                 } else {
                     String msj = Error.variableNotDeclared(temp);
                     int line = ctx.VALOR_STRING().getSymbol().getLine();
                     int col = ctx.VALOR_STRING().getSymbol().getCharPositionInLine();
                     col += 2 + colTemp;
-                    Error.printError(msj, line, col);
+                    Error.printError(msj, line +":"+ col);
                 }
             } else {
                 result.append((String) word + " ");
             }
             colTemp += word.length() + 1;
         }
+        result.deleteCharAt(result.length()-1);
         return (T) new Variable(Constants.STRING, result.toString());
     }
 
@@ -632,13 +542,11 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
         Scanner input = new Scanner(System.in);
         String result = input.nextLine();
         input.close();
-
-        if (result.matches("'-'?[0-9]+")) { // si hace match con la regex es un
-            // INT
+        if (result.matches("'-'?[0-9]+")) {                                     // si hace match con la regex es un INT
             return (T) new Variable(Constants.INT, Integer.parseInt(result));
-        } else if (result.matches("-?[0-9]+.[0-9]+")) { // si no, es un Double
+        } else if (result.matches("-?[0-9]+.[0-9]+")) {                         // sino, es un DOUBLE
             return (T) new Variable(Constants.DOUBLE, Double.parseDouble(result));
-        } else { // si no es un string
+        } else {                                                                // sino, es un STRING
             return (T) new Variable(Constants.STRING, result);
         }
     }
@@ -652,12 +560,18 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
      /////////////////////////////////////////////////////////////////////////*/
     
     @Override
-    public T visitInicio_while(tclParser.Inicio_whileContext ctx) {
-        return null;
-    }
-
-    @Override
     public T visitR_while(tclParser.R_whileContext ctx) {
+        tables.add(new HashMap<>());        
+        Variable expresion = (Variable) visitExpresion(ctx.inicio_while().expresion());        
+        if(expresion.getTipo() != Constants.INT){
+            String msj = Error.incompatibleData(Error.ERR_INT, (expresion.getTipo() == Constants.DOUBLE) ?  Error.ERR_DOUBLE : Error.ERR_STRING);
+            Error.printError(msj, location(ctx.inicio_while().expresion()));
+        }
+        while((int)expresion.getValor() != 0){
+            visitCuerpo_loop(ctx.cuerpo_loop());
+            expresion = (Variable) visitExpresion(ctx.inicio_while().expresion());
+        }        
+        tables.remove(tables.size()-1);
         return null;
     }
 
@@ -675,22 +589,18 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
             var1 = (Variable) visitExp_or(ctx.exp_or());
             var3 = new Variable(Constants.INT, null);
             if (var1.getTipo() == Constants.INT && var2.getTipo() == Constants.INT) {
-                var3.setValor((!((Integer) var1.getValor()).equals(0) || !((Integer) var2.getValor()).equals(0))
-                        ? (Object) 1 : (Object) 0);
+                var3.setValor((!((Integer) var1.getValor()).equals(0) || !((Integer) var2.getValor()).equals(0)) ? (Object) 1 : (Object) 0);
             } else {
-                String tipo;
-                int line, col;
+                String tipo, location;
                 if (var1.getTipo() != Constants.INT) {
-                    line = ctx.exp_or().getStart().getLine();
-                    col = ctx.exp_or().getStart().getCharPositionInLine();
                     tipo = (var1.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_STRING;
+                    location = location(ctx.exp_or());
                 } else {
-                    line = ctx.exp_and().getStart().getLine();
-                    col = ctx.exp_and().getStart().getCharPositionInLine();
                     tipo = (var2.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_STRING;
+                    location = location(ctx.exp_and());
                 }
                 String msj = Error.incompatibleData(Error.ERR_INT, tipo);
-                Error.printError(msj, line, col + 1);
+                Error.printError(msj, location);
             }
             return (T) var3;
         }
@@ -703,22 +613,18 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
             var1 = (Variable) visitExp_and(ctx.exp_and());
             var3 = new Variable(Constants.INT, null);
             if (var1.getTipo() == Constants.INT && var2.getTipo() == Constants.INT) {
-                var3.setValor((!((Integer) var1.getValor()).equals(0) && !((Integer) var2.getValor()).equals(0))
-                        ? (Object) 1 : (Object) 0);
+                var3.setValor((!((Integer) var1.getValor()).equals(0) && !((Integer) var2.getValor()).equals(0)) ? (Object) 1 : (Object) 0);
             } else {
-                String tipo;
-                int line, col;
+                String tipo, location;
                 if (var1.getTipo() != Constants.INT) {
-                    line = ctx.exp_and().getStart().getLine();
-                    col = ctx.exp_and().getStart().getCharPositionInLine();
                     tipo = (var1.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_STRING;
+                    location = location(ctx.exp_and());
                 } else {
-                    line = ctx.exp_ig().getStart().getLine();
-                    col = ctx.exp_ig().getStart().getCharPositionInLine();
                     tipo = (var2.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_STRING;
+                    location = location(ctx.exp_ig());
                 }
                 String msj = Error.incompatibleData(Error.ERR_INT, tipo);
-                Error.printError(msj, line, col + 1);
+                Error.printError(msj, location);
             }
             return (T) var3;
         }
@@ -729,60 +635,46 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
         Variable var1, var2 = (Variable) visitExp_rel(ctx.exp_rel()), var3;
         if (ctx.exp_ig() != null) {
             var1 = (Variable) visitExp_ig(ctx.exp_ig());
-
             var3 = new Variable(Constants.INT, null);
             String op = ctx.op_ig().getText();
             if (op.equals("ne") || op.equals("eq")) {
                 if (var1.getTipo() == Constants.STRING && var2.getTipo() == Constants.STRING) {
                     if (op.equals("eq")) {
-                        var3.setValor((((String) var1.getValor()).equals((String) var2.getValor())) ? (Object) 1
-                                : (Object) 0);
+                        var3.setValor((((String) var1.getValor()).equals((String) var2.getValor())) ? (Object) 1 : (Object) 0);
                     } else {
-                        var3.setValor((((String) var1.getValor()).equals((String) var2.getValor())) ? (Object) 0
-                                : (Object) 1);
+                        var3.setValor((((String) var1.getValor()).equals((String) var2.getValor())) ? (Object) 0 : (Object) 1);
                     }
                 } else {
-                    String tipo;
-                    int line, col;
+                    String tipo, location;
                     if (var1.getTipo() != Constants.STRING) {
                         tipo = (var1.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_INT;
-                        line = ctx.exp_ig().getStart().getLine();
-                        col = ctx.exp_ig().getStart().getCharPositionInLine();
+                        location = location(ctx.exp_ig());
                     } else {
                         tipo = (var2.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_INT;
-                        line = ctx.exp_rel().getStart().getLine();
-                        col = ctx.exp_rel().getStart().getCharPositionInLine();
+                        location = location(ctx.exp_rel());
                     }
                     String msj = Error.incompatibleData(Error.ERR_STRING, tipo);
-                    Error.printError(msj, line, col + 1);
+                    Error.printError(msj, location);
                 }
             } else {
-                String msj = null;
                 if (var1.getTipo() == Constants.STRING || var2.getTipo() == Constants.STRING) {
-                    msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
-                    int line = (var1.getTipo() == Constants.STRING) ? ctx.exp_ig().getStart().getLine()
-                            : ctx.exp_rel().getStart().getLine(),
-                            col = (var1.getTipo() == Constants.STRING) ? ctx.exp_ig().getStart().getCharPositionInLine()
-                            : ctx.exp_rel().getStart().getCharPositionInLine();
-                    Error.printError(msj, line, col + 1);
+                    String msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING),
+                            location = (var1.getTipo() == Constants.STRING) ? location(ctx.exp_ig()) : location(ctx.exp_rel());
+                    Error.printError(msj, location);
                 }
                 if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
+                    Double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
+                            v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
                     if (op.equals("==")) {
-                        Double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
-                                v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
                         var3.setValor(((v1).equals(v2)) ? (Object) 1 : (Object) 0);
                     } else {
-                        Double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
-                                v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
                         var3.setValor(((v1).equals(v2)) ? (Object) 0 : (Object) 1);
                     }
                 } else {
                     if (op.equals("==")) {
-                        var3.setValor((((Integer) var1.getValor()).equals((Integer) var2.getValor())) ? (Object) 1
-                                : (Object) 0);
+                        var3.setValor((((Integer) var1.getValor()).equals((Integer) var2.getValor())) ? (Object) 1 : (Object) 0);
                     } else {
-                        var3.setValor((((Integer) var1.getValor()).equals((Integer) var2.getValor())) ? (Object) 0
-                                : (Object) 1);
+                        var3.setValor((((Integer) var1.getValor()).equals((Integer) var2.getValor())) ? (Object) 0 : (Object) 1);
                     }
                 }
             }
@@ -797,25 +689,16 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
             var1 = (Variable) visitExp_rel(ctx.exp_rel());
             var3 = new Variable(Constants.INT, null);
             String op = ctx.op_rel().getText();
-
             if (var1.getTipo() == Constants.STRING && var2.getTipo() != Constants.STRING) {
-                String tipo = (var2.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_INT;
-                int line = ctx.exp_add().getStart().getLine(),
-                        col = ctx.exp_add().getStart().getCharPositionInLine();
-
-                String msj = Error.incompatibleData(Error.ERR_STRING, tipo);
-                Error.printError(msj, line, col + 1);
+                String msj = Error.incompatibleData(Error.ERR_STRING, (var2.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_INT);
+                Error.printError(msj, location(ctx.exp_add()));
             } else if (var2.getTipo() == Constants.STRING && var1.getTipo() != Constants.STRING) {
-                int line = ctx.exp_add().getStart().getLine(),
-                        col = ctx.exp_add().getStart().getCharPositionInLine();
-
                 String msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
-                Error.printError(msj, line, col + 1);
+                Error.printError(msj, location(ctx.exp_add()));
             }
             if (op.equals(">=")) {
                 if (var1.getTipo() == Constants.STRING && var2.getTipo() == Constants.STRING) {
-                    var3.setValor((((String) var1.getValor()).compareTo((String) var2.getValor()) >= 0) ? (Object) 1
-                            : (Object) 0);
+                    var3.setValor((((String) var1.getValor()).compareTo((String) var2.getValor()) >= 0) ? (Object) 1 : (Object) 0);
                 } else if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
                     double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
                             v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
@@ -825,8 +708,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
                 }
             } else if (op.equals("<=")) {
                 if (var1.getTipo() == Constants.STRING && var2.getTipo() == Constants.STRING) {
-                    var3.setValor((((String) var1.getValor()).compareTo((String) var2.getValor()) <= 0) ? (Object) 1
-                            : (Object) 0);
+                    var3.setValor((((String) var1.getValor()).compareTo((String) var2.getValor()) <= 0) ? (Object) 1 : (Object) 0);
                 } else if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
                     double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
                             v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
@@ -836,8 +718,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
                 }
             } else if (op.equals("<")) {
                 if (var1.getTipo() == Constants.STRING && var2.getTipo() == Constants.STRING) {
-                    var3.setValor((((String) var1.getValor()).compareTo((String) var2.getValor()) < 0) ? (Object) 1
-                            : (Object) 0);
+                    var3.setValor((((String) var1.getValor()).compareTo((String) var2.getValor()) < 0) ? (Object) 1 : (Object) 0);
                 } else if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
                     double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
                             v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
@@ -847,8 +728,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
                 }
             } else if (op.equals(">")) {
                 if (var1.getTipo() == Constants.STRING && var2.getTipo() == Constants.STRING) {
-                    var3.setValor((((String) var1.getValor()).compareTo((String) var2.getValor()) > 0) ? (Object) 1
-                            : (Object) 0);
+                    var3.setValor((((String) var1.getValor()).compareTo((String) var2.getValor()) > 0) ? (Object) 1 : (Object) 0);
                 } else if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
                     double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
                             v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
@@ -866,20 +746,11 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
         Variable var1, var2 = (Variable) visitExp_mul(ctx.exp_mul()), var3;
         if (ctx.exp_add() != null) {
             var1 = (Variable) visitExp_add(ctx.exp_add());
-            ;
-
-            String msj = null;
             if (var1.getTipo() == Constants.STRING || var2.getTipo() == Constants.STRING) {
-                msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
+                String msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING),
+                        location = (var1.getTipo() == Constants.STRING) ? location(ctx.exp_add()) : location(ctx.exp_mul());
+                Error.printError(msj, location);
             }
-            if (msj != null) {
-                int line = (var1.getTipo() == Constants.STRING) ? ctx.exp_add().getStart().getLine()
-                        : ctx.exp_mul().getStart().getLine(),
-                        col = (var1.getTipo() == Constants.STRING) ? ctx.exp_add().getStart().getCharPositionInLine()
-                        : ctx.exp_mul().getStart().getCharPositionInLine();
-                Error.printError(msj, line, col + 1);
-            }
-
             var3 = new Variable(-1, null);
             char op = ctx.op_add().getText().charAt(0);
             if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
@@ -911,45 +782,24 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
             char op = ctx.op_mul().getText().charAt(0);
             if (op == '%') {
                 String msj = null;
-                if (var1.getTipo() == Constants.STRING) {
-                    msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING);
-                } else if (var1.getTipo() == Constants.DOUBLE) {
-                    msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
-                } else if (var2.getTipo() == Constants.STRING) {
-                    msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING);
-                } else if (var2.getTipo() == Constants.DOUBLE) {
-                    msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
+                if (var1.getTipo() == Constants.STRING || var1.getTipo() == Constants.DOUBLE) {
+                    msj = Error.incompatibleData(Error.ERR_INT, (var1.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_STRING);
+                    Error.printError(msj, location(ctx.exp_mul()));
+                } else if (var2.getTipo() == Constants.STRING || var2.getTipo() == Constants.DOUBLE) {
+                    msj = Error.incompatibleData(Error.ERR_INT, (var2.getTipo() == Constants.DOUBLE) ? Error.ERR_DOUBLE : Error.ERR_STRING);
+                    Error.printError(msj, location(ctx.exp_pot()));
                 }
-                if (msj != null) {
-                    int line = (var1.getTipo() == Constants.DOUBLE || var1.getTipo() == Constants.STRING)
-                            ? ctx.exp_mul().getStart().getLine() : ctx.exp_pot().getStart().getLine(),
-                            col = ((var1.getTipo() == Constants.DOUBLE || var1.getTipo() == Constants.STRING)
-                            ? ctx.exp_mul().getStart().getCharPositionInLine()
-                            : ctx.exp_pot().getStart().getCharPositionInLine());
-                    Error.printError(msj, line, col + 1);
-                }
-
                 var3 = new Variable(Constants.INT, (Object) ((int) var1.getValor() % (int) var2.getValor()));
             } else {
-                String msj = null;
                 if (var1.getTipo() == Constants.STRING || var2.getTipo() == Constants.STRING) {
-                    msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
+                    String msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
+                    String location = (var1.getTipo() == Constants.STRING) ? location(ctx.exp_mul()) : location(ctx.exp_pot());                            
+                    Error.printError(msj, location);
                 }
-                if (msj != null) {
-                    int line = (var1.getTipo() == Constants.STRING) ? ctx.exp_mul().getStart().getLine()
-                            : ctx.exp_pot().getStart().getLine(),
-                            col = (var1.getTipo() == Constants.STRING)
-                            ? ctx.exp_mul().getStart().getCharPositionInLine()
-                            : ctx.exp_pot().getStart().getCharPositionInLine();
-                    Error.printError(msj, line, col + 1);
-                }
-
                 var3 = new Variable(-1, null);
                 if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
-                    double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor()
-                            : (int) var1.getValor()),
-                            v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor()
-                            : (int) var2.getValor());
+                    double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
+                            v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
                     if (op == '*') {
                         var3.setValor((Object) (v1 * v2));
                     } else {
@@ -974,19 +824,12 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
         Variable var1, var2 = (Variable) visitExp_una(ctx.exp_una()), var3;
         if (ctx.exp_pot() != null) {
             var1 = (Variable) visitExp_pot(ctx.exp_pot());
-
-            String msj = null;
             if (var1.getTipo() == Constants.STRING || var2.getTipo() == Constants.STRING) {
-                msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
-                int line = (var1.getTipo() == Constants.STRING) ? ctx.exp_pot().getStart().getLine()
-                        : ctx.exp_una().getStart().getLine(),
-                        col = (var1.getTipo() == Constants.STRING) ? ctx.exp_pot().getStart().getCharPositionInLine()
-                        : ctx.exp_una().getStart().getCharPositionInLine();
-                Error.printError(msj, line, col + 1);
+                String msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING), 
+                        location =(var1.getTipo() == Constants.STRING) ? location(ctx.exp_pot()) : location(ctx.exp_una());
+                Error.printError(msj, location);
             }
-
             var3 = new Variable(-1, null);
-
             if (var1.getTipo() == Constants.DOUBLE || var2.getTipo() == Constants.DOUBLE) {
                 double v1 = ((var1.getTipo() == Constants.DOUBLE) ? (double) var1.getValor() : (int) var1.getValor()),
                         v2 = ((var2.getTipo() == Constants.DOUBLE) ? (double) var2.getValor() : (int) var2.getValor());
@@ -1006,19 +849,17 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
         if (ctx.op_una() != null) {
             char op = ctx.op_una().getText().charAt(0);
             Variable var = (Variable) visitExp_una(ctx.exp_una());
-            int line = ctx.exp_una().getStart().getLine(), col = ctx.exp_una().getStart().getCharPositionInLine();
+            String location = location(ctx.exp_una());
             if (op == '!') {
                 if (var.getTipo() != Constants.INT) {
-                    String msj = (var.getTipo() == Constants.STRING)
-                            ? Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING)
-                            : Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
-                    Error.printError(msj, line, col + 1);
+                    String msj = Error.incompatibleData(Error.ERR_INT, (var.getTipo() == Constants.STRING) ? Error.ERR_STRING : Error.ERR_DOUBLE);
+                    Error.printError(msj, location);
                 }
                 var.setValor(((Integer) var.getValor() == 0) ? (Object) 1 : (Object) 0);
             } else {
                 if (var.getTipo() == Constants.STRING) {
                     String msj = Error.incompatibleData(Error.ERR_INT + ", " + Error.ERR_DOUBLE, Error.ERR_STRING);
-                    Error.printError(msj, line, col + 1);
+                    Error.printError(msj, location);
                 } else if (var.getTipo() == Constants.INT) {
                     var.setValor((Object) (-(Integer) var.getValor()));
                 } else {
@@ -1054,9 +895,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
         Object temp = valueID(nameVar);
         if (temp == null) { // Si se cumple, la cariable no existe
             String msj = Error.variableNotDeclared(nameVar);
-            int line = id_ctx.getSymbol().getLine();
-            int col = id_ctx.getSymbol().getCharPositionInLine();
-            Error.printError(msj, line, col);
+            Error.printError(msj, location(id_ctx));
             return null;
         } else {
             if (indice != null) { // Si existe algun indice
@@ -1064,9 +903,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
                 // Es una variable y se esta pasando como arreglo -> ERROR
                 if (temp.getClass().getName().equals("business.Variable")) {
                     String msj = Error.variableNotArray(nameVar);
-                    int line = id_ctx.getSymbol().getLine();
-                    int col = id_ctx.getSymbol().getCharPositionInLine();
-                    Error.printError(msj, line, col);
+                    Error.printError(msj, location(id_ctx));
                     return null;
                 }
 
@@ -1076,9 +913,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
                     return (T) arr.getValue(indice.getValor());
                 } else {
                     String msj = Error.arrayWithoutKey(nameVar, indice.valorToString());
-                    int line = id_ctx.getSymbol().getLine();
-                    int col = id_ctx.getSymbol().getCharPositionInLine();
-                    Error.printError(msj, line, col);
+                    Error.printError(msj, location(id_ctx));
                     return null;
                 }
             } else {
@@ -1086,9 +921,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
                 // ERROR
                 if (temp.getClass().getName().equals("business.Arreglo")) {
                     String msj = Error.variableIsArray(nameVar);
-                    int line = id_ctx.getSymbol().getLine();
-                    int col = id_ctx.getSymbol().getCharPositionInLine();
-                    Error.printError(msj, line, col);
+                    Error.printError(msj, location(id_ctx));
                     return null;
                 } else {
                     return (T) (Variable) temp;
@@ -1126,7 +959,14 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
         }
         return null;
     }
+    
+    public String location(TerminalNode tn) {
+        return tn.getSymbol().getLine() + ":" + tn.getSymbol().getCharPositionInLine();
+    }
 
+    public String location(ParserRuleContext ctx) {
+        return ctx.getStart().getLine() + ":" + (ctx.getStart().getCharPositionInLine()+1);
+    }
 }
 
     /*//////////////////////////////////////////////////////////////////////////

@@ -6,8 +6,8 @@ public class Error {
 	public static final String ERR_INT = "integer";
 	public static final String ERR_DOUBLE = "double";
 	
-	public static void printError(String mensaje, int line, int col){
-		System.err.printf("<%d:%d> Error semantico:  %s\n", line,col, mensaje);
+	public static void printError(String mensaje, String loc){
+		System.err.printf("<%s> Error semantico:  %s\n", loc, mensaje);
 		System.exit(-1);
 	}
 	
