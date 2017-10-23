@@ -19,13 +19,18 @@ import classes.tclParser.AgrupContext;
 import classes.tclParser.Asig_forContext;
 import classes.tclParser.AsignacionContext;
 import classes.tclParser.Case2Context;
+import classes.tclParser.Case2_loopContext;
 import classes.tclParser.Case_funcionContext;
+import classes.tclParser.Case_loopContext;
+import classes.tclParser.Cuerpo_loopContext;
 import classes.tclParser.Dec_forContext;
 import classes.tclParser.DeclaracionContext;
 import classes.tclParser.Declaracion_funcionContext;
+import classes.tclParser.Default_loopContext;
 import classes.tclParser.Else_funcionContext;
 import classes.tclParser.ElseifContext;
 import classes.tclParser.Elseif_funcionContext;
+import classes.tclParser.Elseif_loopContext;
 import classes.tclParser.Exp_addContext;
 import classes.tclParser.Exp_andContext;
 import classes.tclParser.Exp_igContext;
@@ -36,6 +41,7 @@ import classes.tclParser.Exp_relContext;
 import classes.tclParser.Exp_unaContext;
 import classes.tclParser.GetsContext;
 import classes.tclParser.If_funcionContext;
+import classes.tclParser.If_loopContext;
 import classes.tclParser.IncrementoContext;
 import classes.tclParser.IndiceContext;
 import classes.tclParser.InicioContext;
@@ -45,13 +51,16 @@ import classes.tclParser.Inicio_ifContext;
 import classes.tclParser.Inicio_switchContext;
 import classes.tclParser.Param_funcContext;
 import classes.tclParser.PutsContext;
+import classes.tclParser.R_breakContext;
 import classes.tclParser.R_caseContext;
+import classes.tclParser.R_continueContext;
 import classes.tclParser.R_defaultContext;
 import classes.tclParser.R_elseContext;
 import classes.tclParser.R_forContext;
 import classes.tclParser.R_ifContext;
 import classes.tclParser.R_switchContext;
 import classes.tclParser.Switch_funcionContext;
+import classes.tclParser.Switch_loopContext;
 import classes.tclParser.TermContext;
 import classes.tclParser.ValorContext;
 
@@ -60,6 +69,9 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
     List<Map<String, Object>> tables = new ArrayList<>();
     Map<String, Subrutina> tableFunctions = new HashMap<>();
     Subrutina funcActual = null;
+    
+    boolean hasToBreak;
+    boolean hasToContinue;
 
     public T visitInicio(InicioContext ctx) {
         tables.add(new HashMap<>());
@@ -83,7 +95,6 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
                 /*
 				 * Hay que obetener los argumentos, y ponerle esos argumentos a
 				 * la funcion
-<<<<<<< HEAD
 				 */
 			}
 		}
@@ -156,7 +167,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 	@Override
 	public T visitR_if(R_ifContext ctx) {
 		int result = (int) (((Variable) visitInicio_if(ctx.inicio_if())).getValor());
-		if (result == 1) {
+		if (result != 0) {
 			tables.add(new HashMap<>());
 			visitCuerpo_inst(ctx.cuerpo_inst());
 			tables.remove(tables.size() - 1);
@@ -172,7 +183,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 			return visitR_else(ctx.r_else());
 		} else {
 			int result = (int) (((Variable) visitInicio_elseif(ctx.inicio_elseif())).getValor());
-			if (result == 1) {
+			if (result != 0) {
 				tables.add(new HashMap<>());
 				visitCuerpo_inst(ctx.cuerpo_inst());
 				tables.remove(tables.size()-1);
@@ -267,26 +278,13 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 	public T visitR_for(R_forContext ctx) {
 		tables.add(new HashMap<>());
 		
-		Variable iter = (Variable)visitDec_for(ctx.inicio_for().dec_for());
-		String nameIncr = ctx.inicio_for().IDENTIFICADOR().getText();
-		Variable varToIncr = (Variable)visitIdentificador(ctx.inicio_for().IDENTIFICADOR(), null);
-		Variable incr = (Variable) visitIncremento(ctx.inicio_for().incremento());		
+		visitDec_for(ctx.inicio_for().dec_for());		
 		Variable expresion = (Variable) visitExpresion(ctx.inicio_for().expresion());
 		
 		
-		if(iter.getTipo() != Constants.INT){
+		if(expresion.getTipo() != Constants.INT){
 			String msj = "";
-			if(iter.getTipo() == Constants.DOUBLE){
-				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
-			} else {
-				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING);
-			}
-			int line = ctx.inicio_for().dec_for().asig_for().getStart().getLine();
-			int col = ctx.inicio_for().dec_for().asig_for().getStart().getCharPositionInLine()+1;
-			Error.printError(msj, line, col);
-		} else if(expresion.getTipo() != Constants.INT){
-			String msj = "";
-			if(iter.getTipo() == Constants.DOUBLE){
+			if(expresion.getTipo() == Constants.DOUBLE){
 				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
 			} else {
 				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING);
@@ -294,20 +292,26 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 			int line = ctx.inicio_for().expresion().getStart().getLine();
 			int col = ctx.inicio_for().expresion().getStart().getCharPositionInLine()+1;
 			Error.printError(msj, line, col);
-		} else if(varToIncr == null){
-			String msj = Error.variableNotDeclared(nameIncr);
-			int line = ctx.inicio_for().IDENTIFICADOR().getSymbol().getLine();
-			int col = ctx.inicio_for().IDENTIFICADOR().getSymbol().getCharPositionInLine()+1;
-			Error.printError(msj, line, col);			
-		}else {			
-			while((int)expresion.getValor() != 0){
-				visitCuerpo_loop(ctx.cuerpo_loop());				
-				int newVal = (int)varToIncr.getValor() + (int)incr.getValor();
-				varToIncr.setValor(newVal);
-				expresion = (Variable) visitExpresion(ctx.inicio_for().expresion());
-			}			
 		}
-			
+		
+
+		Variable varToIncr = (Variable)visitIdentificador(ctx.inicio_for().IDENTIFICADOR(), null);
+		Variable incr = (Variable) visitIncremento(ctx.inicio_for().incremento());		
+		while((int)expresion.getValor() != 0){
+			hasToBreak = false;
+			hasToContinue = false;
+			visitCuerpo_loop(ctx.cuerpo_loop());
+			if(hasToBreak){
+				hasToBreak = false;
+				break;
+			}
+			if(hasToContinue)
+				hasToBreak = false;
+			int newVal = (int)varToIncr.getValor() + (int)incr.getValor();
+			varToIncr.setValor(newVal);
+			expresion = (Variable) visitExpresion(ctx.inicio_for().expresion());
+		}			
+					
 		tables.remove(tables.size()-1);
 		return null;
 	}
@@ -327,6 +331,19 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 
 		Variable temp = (Variable)valueID(nameVar);
 		Variable newValue = (Variable) visitAsig_for(ctx.asig_for());
+		
+		if(newValue.getTipo() != Constants.INT){
+			String msj = "";
+			if(newValue.getTipo() == Constants.DOUBLE){
+				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_DOUBLE);
+			} else {
+				msj = Error.incompatibleData(Error.ERR_INT, Error.ERR_STRING);
+			}
+			int line = ctx.asig_for().getStart().getLine();
+			int col = ctx.asig_for().getStart().getCharPositionInLine()+1;
+			Error.printError(msj, line, col);
+		}
+		
 		Map<String, Object> tempTable;
 		if (temp == null) { // Si se cumple la variable no existía
 			tempTable = tables.get(tables.size() - 1);
@@ -348,6 +365,8 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 			return visitExpresion(ctx.expr().expresion());
 		}
 	}
+	
+	
 	
 	@Override
 	public T visitInicio_case(Inicio_caseContext ctx) {
@@ -594,7 +613,7 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
 
     public T visitValor(ValorContext ctx) {
         if (ctx.VALOR_DOUBLE() != null) { // Mira si es un double
-            return (T) new Variable(Constants.DOUBLE, Double.parseDouble(ctx.VALOR_DOUBLE().getText()));
+        	return (T) new Variable(Constants.DOUBLE, Double.parseDouble(ctx.VALOR_DOUBLE().getText()));
         } else if (ctx.VALOR_ENTERO() != null) { // Mira si es un Entero
             return (T) new Variable(Constants.INT, Integer.parseInt(ctx.VALOR_ENTERO().getText()));
         }
@@ -661,6 +680,123 @@ public class VisitorTCL<T> extends tclBaseVisitor<T> {
         return null;
     }
 
+    
+    
+    @Override
+    public T visitIf_loop(If_loopContext ctx) {
+    	int result = (int) (((Variable) visitInicio_if(ctx.inicio_if())).getValor());
+    	if(result != 0){
+    		tables.add(new HashMap<>());
+    		visitCuerpo_loop(ctx.cuerpo_loop());
+    		tables.remove(tables.size()-1);
+    	} else {
+    		visitElseif_loop(ctx.elseif_loop());
+    	}
+    	return null;
+    }
+    
+    @Override
+    public T visitElseif_loop(Elseif_loopContext ctx) {
+    	if(ctx.else_loop() != null){
+    		return visitElse_loop(ctx.else_loop());
+    	} else {
+    		int result = (int) (((Variable) visitInicio_elseif(ctx.inicio_elseif())).getValor());
+    		if(result != 0){
+    			tables.add(new HashMap<>());
+    			visitCuerpo_loop(ctx.cuerpo_loop());
+    			tables.remove(tables.size()-1);
+    		} else {
+    			visitElseif_loop(ctx.elseif_loop());
+    		}    		
+    	}
+    	
+    	return null;
+    }
+    
+    @Override
+    public T visitCuerpo_loop(Cuerpo_loopContext ctx) {
+    	if(hasToBreak || hasToContinue){
+    		return null;
+    	}
+    	
+    	if(ctx.r_break() != null){
+    		return visitR_break(ctx.r_break());
+    	} else if(ctx.r_continue() != null){
+    		return visitR_continue(ctx.r_continue());
+    	} else {
+    		return visitChildren(ctx);
+    	}
+    	
+    }
+    
+    @Override
+    public T visitSwitch_loop(Switch_loopContext ctx) {
+		Variable var = (Variable) visitInicio_switch(ctx.inicio_switch());
+		Map<String, Object> tempTable = tables.get(tables.size() - 1);
+
+		String nameVar = "-switch";
+		tempTable.put(nameVar, var);
+		visitCase_loop(ctx.case_loop());
+		tempTable.remove(nameVar);
+		return null;
+    }
+    
+    @Override
+    public T visitCase_loop(Case_loopContext ctx) {
+		int valor = (int)((Variable)visitInicio_case(ctx.inicio_case())).getValor();
+		Variable temp = (Variable)tables.get(tables.size()-1).get("-switch");
+		if(valor == (int)temp.getValor()){
+			tables.add(new HashMap<>());
+			visitCuerpo_loop(ctx.cuerpo_loop());
+			tables.remove(tables.size()-1);
+		} else {
+			if(ctx.case2_loop() != null){
+				return visitCase2_loop(ctx.case2_loop());				
+			} 
+		}		
+		return null;
+    }
+    
+    @Override
+    public T visitCase2_loop(Case2_loopContext ctx) {
+		if(ctx.default_loop() != null){
+			return visitDefault_loop(ctx.default_loop());
+		} else {
+			int valor = (int) ((Variable)visitInicio_case(ctx.inicio_case())).getValor();
+			Variable temp = (Variable) tables.get(tables.size()-1).get("-switch");
+			if(valor == (int) temp.getValor()){
+				tables.add(new HashMap<>());
+				visitCuerpo_loop(ctx.cuerpo_loop());
+				tables.remove(tables.size() - 1);
+			} else {
+				if(ctx.case2_loop() != null){
+					return visitCase2_loop(ctx.case2_loop());
+				} 
+			}		
+			return null;			
+		}	
+    }
+    
+    @Override
+    public T visitDefault_loop(Default_loopContext ctx) {
+		tables.add(new HashMap<>());
+		visitCuerpo_loop(ctx.cuerpo_loop());
+		tables.remove(tables.size()-1);		
+		return null;
+    }
+    
+    @Override
+    public T visitR_break(R_breakContext ctx) {
+    	hasToBreak = true;    	
+    	return null;
+    }
+    
+    @Override
+    public T visitR_continue(R_continueContext ctx) {
+    	hasToContinue = true;
+    	return null;
+    }
+    
     /*//////////////////////////////////////////////////////////////////////////
         ___  __   __  ___   ___   ___    __   _    __    __  _   ___    __ 
        | __| \ \_/ / | _,\ | _ \ | __| /' _/ | |  /__\  |  \| | | __| /' _/

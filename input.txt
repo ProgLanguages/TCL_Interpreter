@@ -1,11 +1,14 @@
 proc sum {}{
 }
 
-
-for {set i 0} {$i < 5} {incr i}{
+for {set i 0} {$i < 3} {incr i}{
 	puts "Iterar $i";
 	set a 20;
+	if {$i == 1} then {
+		continue;
+	}
 	for {set a 1} {$a < 5} {incr a}{
 		puts $a;
+		set b 1;
 	}
 }
