@@ -1,26 +1,4 @@
-proc sum {} {
+proc sum {{a}{b}{c}{d}{e}{f}{g}{h}{i}{j}} {
 }
 
-for {set i 0} {$i < 3} {incr i} {
-	puts "Iterar $i";
-	set a 20;
-	if {$i == 1} then {
-		continue;
-	}
-	for {set a 1} {$a < 5} {incr a} {
-		puts $a;
-		set b 1;
-	}
-}
-
-set papu 0;
-while {$papu <= 10} {
-	puts "Iterar $papu";
-	if {$papu == 5} then {
-		set papu [expr {$papu+3}];
-		continue;
-	} elseif {$papu == 7} {
-		break;
-	}
-	set papu [expr {$papu+1}];
-}
+[sum {1}{2}{3}{4}{5}{"Holi"}{"papu"}{3.0}{5.0}{1111111111.11111111}];
